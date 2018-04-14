@@ -11,6 +11,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 import { DynamicFormFieldComponent } from './dynamic-form-field/dynamic-form-field.component';
+import { PageService } from '../providers/page-service/page-service';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { DynamicFormFieldComponent } from './dynamic-form-field/dynamic-form-fie
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    PageService
   ]
 })
 export class AppModule {
