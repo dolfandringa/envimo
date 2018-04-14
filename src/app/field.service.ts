@@ -28,7 +28,7 @@ export class FieldService {
         key: 'ccl_cm',
         label: 'Curved Carapax Length (CCL) in cm',
         validators: [Validators.required, Validators.min(50), Validators.max(250)],
-        type: 'number',
+        type: 'text',
         order: 2
       })
     ];

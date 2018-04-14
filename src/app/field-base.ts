@@ -1,10 +1,10 @@
-import { Validators } from '@angular/forms';
+import { ValidatorFn } from '@angular/forms';
 
 export class FieldBase<T> {
   value: T;
   key: string;
   label: string;
-  validators: Validators[];
+  validators: ValidatorFn[];
   order: number;
   controlType: string;
 
@@ -14,7 +14,7 @@ export class FieldBase<T> {
     label?: string,
     required?: boolean,
     order?: number,
-    validators?: Validators[],
+    validators?: ValidatorFn[],
     controlType?: string
   } = {}){
     this.value = options.value;
