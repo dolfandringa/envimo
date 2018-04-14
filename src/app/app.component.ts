@@ -9,7 +9,7 @@ import { ListPage } from '../pages/list/list';
 @Component({
   templateUrl: 'app.html'
 })
-export class PawikanMonitoring {
+export class EnviMo {
   @ViewChild(Nav) nav: Nav;
 
 

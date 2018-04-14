@@ -2,7 +2,7 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule }          from '@angular/forms';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { PawikanMonitoring } from './app.component';
+import { EnviMo } from './app.component';
 
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
@@ -14,7 +14,7 @@ import { DynamicFormFieldComponent } from './dynamic-form-field/dynamic-form-fie
 
 @NgModule({
   declarations: [
-    PawikanMonitoring,
+    EnviMo,
     HomePage,
     ListPage,
     DynamicFormComponent,
@@ -23,11 +23,11 @@ import { DynamicFormFieldComponent } from './dynamic-form-field/dynamic-form-fie
   imports: [
     BrowserModule,
     ReactiveFormsModule,
-    IonicModule.forRoot(PawikanMonitoring)
+    IonicModule.forRoot(EnviMo)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    PawikanMonitoring,
+    EnviMo,
     HomePage,
     ListPage
   ],
