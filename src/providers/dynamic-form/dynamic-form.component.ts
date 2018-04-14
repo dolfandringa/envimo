@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup }                 from '@angular/forms';
 
-import { FieldBase }              from '../field-base';
-import { FieldControlService }    from '../field-control.service';
+import { FieldBase }              from '../fields/field-base';
+import { FieldControlService }    from '../fields/field-control.service';
  
 
 @Component({

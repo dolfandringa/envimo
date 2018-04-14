@@ -9,8 +9,10 @@ import { ListPage } from '../pages/list/list';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
-import { DynamicFormFieldComponent } from './dynamic-form-field/dynamic-form-field.component';
+
+import { DynamicFormComponent } from '../providers/dynamic-form/dynamic-form.component';
+import { DynamicFormFieldComponent } from '../providers/dynamic-form-field/dynamic-form-field.component';
+
 import { PageService } from '../providers/page-service/page-service';
 
 @NgModule({

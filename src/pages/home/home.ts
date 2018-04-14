@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { FieldService } from '../../app/field.service';
+import { FieldService } from '../../providers/fields/field.service';
 import { PageService } from '../../providers/page-service/page-service';
 
 @Component({
@@ -12,8 +12,8 @@ import { PageService } from '../../providers/page-service/page-service';
 export class HomePage {
   fields: any[];
 
-  constructor(public navCtrl: NavController, public service: FieldService, public pageService: PageService) {
-    this.fields = service.getFields();
+  constructor(public navCtrl: NavController, public fieldService: FieldService, public pageService: PageService) {
+    this.fields = fieldService.getFields();
     this.pageService.pagetitle = 'Home';
   }
 

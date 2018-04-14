@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup }        from '@angular/forms';
  
-import { FieldBase }     from '../field-base';
+import { FieldBase }     from '../fields/field-base';
 
 @Component({
   selector: 'app-field',
