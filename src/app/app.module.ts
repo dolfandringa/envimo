@@ -10,10 +10,15 @@ import { ListPage } from '../pages/list/list';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
+import { DynamicFormService } from '../providers/dynamic-form/dynamic-form.service';
 import { DynamicFormComponent } from '../providers/dynamic-form/dynamic-form.component';
 import { DynamicFormFieldComponent } from '../providers/dynamic-form-field/dynamic-form-field.component';
 
 import { PageService } from '../providers/page-service/page-service';
+
+import { SocketIoModule, SocketIoConfig } from 'ng-socket-io';
+
+const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
 
 @NgModule({
   declarations: [
@@ -25,6 +30,7 @@ import { PageService } from '../providers/page-service/page-service';
   ],
   imports: [
     BrowserModule,
+    SocketIoModule.forRoot(config),
     ReactiveFormsModule,
     IonicModule.forRoot(EnviMo)
   ],
@@ -38,10 +44,11 @@ import { PageService } from '../providers/page-service/page-service';
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    PageService
+    PageService,
+    DynamicFormService
   ]
 })
 export class AppModule {
-  constructor() {
+  constructor(public dfs: DynamicFormService) {
   }
 }

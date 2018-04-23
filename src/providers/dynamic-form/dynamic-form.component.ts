@@ -1,14 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup }                 from '@angular/forms';
+import { FormGroup }                from '@angular/forms';
 
-import { FieldBase }              from '../fields/field-base';
-import { FieldControlService }    from '../fields/field-control.service';
+import { FieldBase }                from '../fields/field-base';
+import { FieldService }             from '../fields/field.service';
  
 
 @Component({
   selector: 'app-dynamic-form',
   templateUrl: './dynamic-form.component.html',
-  providers: [ FieldControlService ]
+  providers: [ FieldService ]
 })
 export class DynamicFormComponent implements OnInit {
 
@@ -16,10 +16,10 @@ export class DynamicFormComponent implements OnInit {
   form: FormGroup;
   payLoad = '';
 
-  constructor(private fcs: FieldControlService) { }
+  constructor(private fs: FieldService) { }
 
   ngOnInit() {
-    this.form = this.fcs.toFormGroup(this.fields);
+    this.form = this.fs.toFormGroup(this.fields);
     this.onChanges();
   }
 

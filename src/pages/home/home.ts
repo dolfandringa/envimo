@@ -11,10 +11,13 @@ import { PageService } from '../../providers/page-service/page-service';
 })
 export class HomePage {
   fields: any[];
+  forms: object;
 
   constructor(public navCtrl: NavController, public fieldService: FieldService, public pageService: PageService) {
     this.fields = fieldService.getFields();
     this.pageService.pagetitle = 'Home';
   }
+
+    
 
 }
