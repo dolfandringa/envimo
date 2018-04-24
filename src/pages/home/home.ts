@@ -1,20 +1,19 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { FieldService } from '../../providers/fields/field.service';
 import { PageService } from '../../providers/page-service/page-service';
+import { DynamicFormService } from '../../providers/dynamic-form/dynamic-form.service';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
-  providers: [FieldService]
 })
 export class HomePage {
   fields: any[];
   forms: object;
 
-  constructor(public navCtrl: NavController, public fieldService: FieldService, public pageService: PageService) {
-    this.fields = fieldService.getFields();
+  constructor(public navCtrl: NavController, public dfs: DynamicFormService, public pageService: PageService) {
+    this.fields = dfs.getFields();
     this.pageService.pagetitle = 'Home';
   }
 
