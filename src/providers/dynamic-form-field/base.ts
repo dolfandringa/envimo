@@ -1,7 +1,7 @@
 import { ValidatorFn } from '@angular/forms';
 
-export class FieldBase<T> {
-  value: T;
+export class FieldBase {
+  value: any;
   key: string;
   label: string;
   validators: ValidatorFn[];
@@ -9,7 +9,7 @@ export class FieldBase<T> {
   controlType: string;
 
   constructor(options: {
-    value?: T,
+    value?: any,
     key?: string,
     label?: string,
     required?: boolean,

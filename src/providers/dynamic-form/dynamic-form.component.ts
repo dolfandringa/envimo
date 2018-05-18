@@ -1,36 +1,63 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup }                from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup }   from '@angular/forms';
+import { ModalController } from 'ionic-angular';
+import { LoadingController } from 'ionic-angular';
 
-import { FieldBase }                from '../fields/field-base';
-import { FieldService }             from '../fields/field.service';
+import { DynamicForm }   from './base';
+import { DynamicSubFormComponent } from './dynamic-subform.component';
+import { DynamicFormService } from './dynamic-form.service';
  
 
 @Component({
   selector: 'app-dynamic-form',
-  templateUrl: './dynamic-form.component.html',
-  providers: [ FieldService ]
+  templateUrl: './dynamic-form.component.html'
 })
-export class DynamicFormComponent implements OnInit {
+export class DynamicFormComponent implements OnInit{
 
-  @Input() fields: FieldBase<any>[] = [];
-  form: FormGroup;
+
   payLoad = '';
+  formgroup: FormGroup;
+  modals = {};
+  datasets: object = {};
+  currentForm: DynamicForm;
+  formsAvailable: boolean = false;
 
-  constructor(private fs: FieldService) { }
+  constructor(
+    public modalCtrl: ModalController,
+    public dfs: DynamicFormService,
+    public loadingCtrl: LoadingController
+  ) {}
 
   ngOnInit() {
-    this.form = this.fs.toFormGroup(this.fields);
-    this.onChanges();
+    this.dfs.getDatasets().subscribe(data => {
+      console.log("newDatasets triggered");
+      console.log("Loading form");
+      this.datasets = data;
+      console.log("Got datasets", this.datasets);
+      //let fields = this.dfs.getFields();
+      //this.currentForm = new DynamicForm('observation', 'Add Observation', fields);
+      this.currentForm = this.datasets['Pawikan']['Encounter'];
+      console.log("Current form", this.currentForm);
+      this.formgroup = this.currentForm.toFormGroup();
+      console.log("Formgroup: ", this.formgroup);
+      for (let subform of this.currentForm.subforms){
+        this.modals[subform.key] = this.modalCtrl.create(DynamicSubFormComponent, {form: subform});
+      }
+      this.formsAvailable = true;
+    });
   }
 
   onChanges() {
-    console.log(this.form.controls);
-    for(const field in this.form.controls){
-      console.log(this.form.get(field).errors);
+    if (this.formsAvailable){
+      console.log(this.formgroup.controls);
+      for(const field in this.formgroup.controls){
+        console.log(this.formgroup.get(field).errors);
+      }
     }
   }
+  
   onSubmit() {
-    this.payLoad = JSON.stringify(this.form.value);
+    this.payLoad = JSON.stringify(this.formgroup.value);
   }
 
 }

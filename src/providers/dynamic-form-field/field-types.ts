@@ -1,6 +1,6 @@
-import { FieldBase } from  './field-base';
+import { FieldBase } from  './base';
 
-export class FieldDropdown extends FieldBase<string>{
+export class FieldDropdown extends FieldBase{
   controlType = 'dropdown';
   options: {'key': string, value: string}[] = [];
 
@@ -10,17 +10,19 @@ export class FieldDropdown extends FieldBase<string>{
   }
 }
 
-export class FieldMultipleDropdown extends FieldBase<string>{
-  controlType = 'dropdown';
+export class FieldMultipleDropdown extends FieldBase{
+  controlType = 'multipledropdown';
+  subforms: string[];
   options: {'key': string, value: string}[] = [];
 
   constructor(options: {} = {}) {
     super(options);
     this.options = options['options'] || [];
+    this.subforms = this.options['subforms'];
   }
 }
 
-export class FieldTextbox extends FieldBase<string> {
+export class FieldTextbox extends FieldBase {
   controlType = 'textbox';
   type: string;
 
@@ -30,7 +32,7 @@ export class FieldTextbox extends FieldBase<string> {
   }
 }
 
-export class FieldDateTime extends FieldBase<string> {
+export class FieldDateTime extends FieldBase {
   controlType = 'datetime';
   type: string;
 
@@ -39,7 +41,7 @@ export class FieldDateTime extends FieldBase<string> {
   }
 }
 
-export class FieldInteger extends FieldBase<string> {
+export class FieldInteger extends FieldBase {
   controlType = 'textbox';
   type: string;
 
@@ -49,7 +51,7 @@ export class FieldInteger extends FieldBase<string> {
   }
 }
 
-export class FieldNumber extends FieldBase<string> {
+export class FieldNumber extends FieldBase {
   controlType = 'textbox';
   type: string;
 

@@ -1,9 +1,10 @@
 import { Socket } from 'ng-socket-io';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { FieldBase }     from '../fields/field-base';
-import { FieldDateTime, FieldMultipleDropdown, FieldDropdown, FieldTextbox, FieldInteger, FieldNumber } from './field-types';
-import { FormGroup, Validators } from '@angular/forms';
+import { FieldBase }     from '../dynamic-form-field/base';
+import { DynamicForm }     from '../dynamic-form/base';
+import { FieldDateTime, FieldMultipleDropdown, FieldDropdown, FieldTextbox, FieldInteger, FieldNumber } from '../dynamic-form-field/field-types';
+import { Validators } from '@angular/forms';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -15,60 +16,78 @@ export class DynamicFormService {
       console.log('Connected');
       this.socket.emit("message", "Hello World!");
     });
-    this.onForms().subscribe(data => {
-      console.log('Got new forms', data);
-      this.forms = data;
-    });
     console.log('Connecting to websocket');
     this.socket.connect();
+    //let fields = this.getFields();
+    //this.forms["someform"] = new DynamicForm('observation', 'Add Observation', fields);
   }
 
   getDefinition(schema :object, ref :string) :[string, object]{
     let defname = ref.split('/').pop()
+    console.log('Getting definition for ', defname,': ',schema['definitions'][defname]);
     return [defname, schema['definitions'][defname]];
+  }
+
+  getDatasets(){
+    return this.socket.fromEvent("newDatasets").map(data => { 
+      let datasets = {};
+      console.log("Got datasets", data);
+      for (let dskey in data){
+        datasets[dskey] = this.mapJSONSchema(data[dskey]);
+      }
+      console.log("Resulting datasets", datasets);
+      return datasets;
+    });
   }
 
   mapJSONSchema(schema){
     let forms = {};
-    for(formkey in schema['properties']){
-      let form = {};
+    for (let formkey in schema['properties']){
+      let formschema: object;
       if('$ref' in schema['properties'][formkey]){
-        ref = schema['properties'][formkey]['$ref'];
-        formschema = this.getDefinition(schema, ref[1]);
+        let ref = schema['properties'][formkey]['$ref'];
+        formschema = this.getDefinition(schema, ref)[1];
       }
       else{
         formschema = schema['properties'][formkey];
       }
-      form['title'] = formschema['title'];
-      let formfields: FieldBase[] = new Array();
-      form['fields'] = formfields;
-      for(propkey in formschema['properties']){
-        prop = formschema['properties'][propkey];
+      console.log("Formschema", formschema);
+      let form = new DynamicForm(formkey, formschema['title'], new Array());
+      for (let propkey in formschema['properties']){
+        let prop = formschema['properties'][propkey];
         let field: FieldBase;
         if (prop['type'] == 'array' || 'enum' in prop){
-          field = this.mapSelectField(propkey, prop);
+          let retval = this.mapSelectField(propkey, prop, schema);
+          field = retval[1];
+          for (let sfkey in retval[0]){
+            console.log("Subform", retval[0][sfkey])
+            //form['subforms'][sfkey] = retval[0][sfkey];
+          }
         }
         else{
           field = this.mapSimpleField(propkey, prop);
         }
-        form['fields'].push(field);
+        console.log("Field", field);
+        form.fields.push(field);
       }
       forms[formkey] = form;
     }
     return forms;
   }
-
-  mapSelectField(key, prop) :[object, FieldBase]{
-    let field BaseField;
+  
+  mapSelectField(key, prop, schema) :[object, FieldBase]{
+    let field: FieldBase;
     let subforms = {};
     let options = {
       key: key,
       label: prop['title'],
       options: [],
-      validators: []
+      validators: [],
+      subforms: []
     };
     if (prop['type'] == 'array'){
-      for (item in prop['items']){
+      for (let ikey in prop['items']){
+        let item = prop['items'][ikey];
         if('$ref' in item){
           let ref = item['$ref'];
           let subschema = this.getDefinition(schema, ref);
@@ -80,27 +99,29 @@ export class DynamicFormService {
         }
       }
       if (subforms != {}){
-        //TODO Add the subforms to the field.
+        for (let sfkey in subforms){
+          options['subforms'].push(sfkey);
+        }
       }
-      field = FieldMultipleDropdown();
+      field = new FieldMultipleDropdown(options);
     }
     else{ 
       if ('enum' in prop){
         options['options'] = prop['enum'];
       }
-      field = FieldDropdown(options);
+      field = new FieldDropdown(options);
     }
     return [subforms, field];
   }
 
   mapSimpleField(key, prop) :FieldBase{
-    let fieldtype: FieldBase;
+    let fieldtype: typeof FieldBase;
     let base_props = {
       key: key,
       label: prop['title'],
       validators: []
     }
-    ft = prop['type'];
+    let ft = prop['type'];
     if ('minimum' in prop){
       base_props.validators.push(Validators.min(prop['minimum']));
     }
@@ -123,7 +144,7 @@ export class DynamicFormService {
             case 'email':
               fieldtype = FieldTextbox;
               base_props['type'] = 'email';
-              base_props.validators.push(Validators.email());
+              base_props.validators.push(Validators.email);
               break;
           }
         }
@@ -143,8 +164,8 @@ export class DynamicFormService {
   }
   
   getFields() {
-    let fields: FieldBase<any>[] = [
-      new FieldDropdown({
+    let fields: FieldBase[] = [
+      new FieldMultipleDropdown({
         key: 'species',
         label: 'Species',
         validators: [Validators.required],
@@ -169,10 +190,6 @@ export class DynamicFormService {
 
     return fields.sort((a, b) => a.order - b.order);
 
-  }
-
-  onForms(){
-    return this.socket.fromEvent("newForms");
   }
 
   onConnect(){

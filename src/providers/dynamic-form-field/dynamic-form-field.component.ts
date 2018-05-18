@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup }        from '@angular/forms';
  
-import { FieldBase }     from '../fields/field-base';
+import { FieldBase }     from './base';
 
 @Component({
   selector: 'app-field',
@@ -9,7 +9,7 @@ import { FieldBase }     from '../fields/field-base';
 })
 export class DynamicFormFieldComponent {
 
-  @Input() field: FieldBase<any>;
+  @Input() field: FieldBase;
   @Input() form: FormGroup;
 
   get isValid() { return this.form.controls[this.field.key].valid; }
