@@ -11,26 +11,30 @@ export class DynamicSubFormComponent implements OnInit {
 
   form: DynamicForm;
   payLoad = '';
-  formgroup: FormGroup;
+  formGroup: FormGroup;
 
   constructor(params: NavParams) { 
     this.form = params.get('form');
   }
 
+  showSubForm(name: string){
+    console.log("Nothing to see here.");
+  }
+
   ngOnInit() {
-    this.formgroup = this.form.toFormGroup();
+    this.formGroup = this.form.toFormGroup();
     this.onChanges();
   }
 
   onChanges() {
-    console.log(this.formgroup.controls);
-    for(const field in this.formgroup.controls){
-      console.log(this.formgroup.get(field).errors);
+    console.log(this.formGroup.controls);
+    for(const field in this.formGroup.controls){
+      console.log(this.formGroup.get(field).errors);
     }
   }
 
   onSubmit() {
-    this.payLoad = JSON.stringify(this.formgroup.value);
+    this.payLoad = JSON.stringify(this.formGroup.value);
   }
 
 }

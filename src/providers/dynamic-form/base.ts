@@ -3,19 +3,12 @@ import { FormControl, FormGroup }   from '@angular/forms';
 
 export class DynamicForm {
 
-  subforms: DynamicForm[] = [];
+  subforms: { [s: string]: DynamicForm; } = {};
   
   constructor(public key: string, public title:string, public fields: FieldBase[]){
   }
 
-  public getSubForm(name: string) :DynamicForm{
-    for (let subform of this.subforms){
-      if (subform.key == name){
-        return subform
-      }
-    }
-  }
-  
+
   toFormGroup() {
   	let group = {};
     console.log("fields: ", this.fields);
