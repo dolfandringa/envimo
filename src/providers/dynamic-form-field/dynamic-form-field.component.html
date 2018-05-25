@@ -4,8 +4,8 @@
   <ion-select *ngIf="field.controlType=='dropdown'" [id]="field.key" [formControlName]="field.key">
     <ion-option *ngFor="let opt of field.options" [value]="opt.id">{{opt.label}}</ion-option>
   </ion-select>
-  <ion-input *ngIf="field.controlType=='imageupload'" [id]="field.key" [formControlName]="field.key" type="hidden"></ion-input>
-  <button type="button" *ngIf="field.controlType=='imageupload'" ion-button item-end (click)="getPicture()">Get picture</button>
+  Hallo
+  <ion-image-input item-content *ngIf="field.controlType=='imageupload'" [id]="field.key" [formControlName]="field.key"></ion-image-input>
   <ion-select multiple *ngIf="field.controlType=='multipledropdown'" [id]="field.key" [formControlName]="field.key">
     <ion-option *ngFor="let opt of field.options" [value]="opt.id">{{opt.label}}</ion-option>
   </ion-select>

@@ -1,5 +1,4 @@
 import { FieldBase } from  './base';
-import { Camera, CameraOptions } from '@ionic-native/camera';
 
 export class FieldDropdown extends FieldBase{
   controlType = 'dropdown';
@@ -13,24 +12,8 @@ export class FieldDropdown extends FieldBase{
 
 export class FieldImageUpload extends FieldBase {
   controlType = 'imageupload';
-  cameraoptions: CameraOptions;  
-  constructor(options: {} = {}, camera: Camera){
+  constructor(options: {} = {}) {
     super(options);
-    this.camera = camera;
-    this.cameraoptions = {
-      mediaType: this.camera.MediaType.PICTURE,
-      destinationType: this.camera.DestinationType.FILE_URI,
-      encodingType: this.camera.EncodingType.JPEG
-    };
-
-    switch (options['contentMediaType']){
-      case 'image/jpeg':
-        this.cameraoptions['encodingType'] = this.camera.EncodingType.JPEG;
-        break;
-      case 'image/png':
-        this.cameraoptions['encodingType'] = this.camera.EncodingType.PNG;
-        break;
-    }
   }
 }
 

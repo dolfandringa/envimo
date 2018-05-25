@@ -31,12 +31,6 @@ export class DynamicFormFieldComponent implements OnInit{
     }
   }
 
-  getPicture(){
-    console.log("Clicked for field", this.field);
-    this.field.camera.getPicture(this.field.cameraoptions).then((imageData) => {
-      console.log('Got picture', imageData);
-    });
-  }
 
   get isValid() { 
     let valid = this.formGroup.controls[this.field.key].valid;

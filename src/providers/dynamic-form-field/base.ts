@@ -1,12 +1,9 @@
 import { ValidatorFn } from '@angular/forms';
-import { Camera, CameraOptions } from '@ionic-native/camera';
 
 export class FieldBase {
   subforms: string[];
   value: any;
   key: string;
-  camera: Camera;
-  cameraoptions: CameraOptions;
   label: string;
   validators: ValidatorFn[];
   order: number;

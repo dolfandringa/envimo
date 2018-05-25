@@ -7,7 +7,7 @@ import { FieldDateTime, FieldMultipleDropdown, FieldDropdown, FieldTextbox, Fiel
 import { FieldImageUpload } from '../dynamic-form-field/field-types';
 import { Validators } from '@angular/forms';
 import 'rxjs/add/operator/map';
-import { Camera } from '@ionic-native/camera';
+//import { Camera } from '@ionic-native/camera';
 import { DynamicSubFormComponent } from './dynamic-subform.component';
 import { ModalController } from 'ionic-angular';
 
@@ -19,7 +19,7 @@ export class DynamicFormService {
 
   constructor(
     private socket: Socket,
-    private camera: Camera,
+    //private camera: Camera,
     public modalCtrl: ModalController
   ) {
     console.log("Started dynamic form service");
@@ -29,8 +29,6 @@ export class DynamicFormService {
     });
     console.log('Connecting to websocket');
     this.socket.connect();
-    //let fields = this.getFields();
-    //this.forms["someform"] = new DynamicForm('observation', 'Add Observation', fields);
   }
 
   getDefinition(schema :object, ref :string) :[string, object]{
@@ -115,7 +113,7 @@ export class DynamicFormService {
       contentEncoding: prop['contentEncoding']
     }
     if (['image/png', 'image/jpeg'].indexOf(prop['contentMediaType'])>-1){
-      field = new FieldImageUpload(options, this.camera);
+      field = new FieldImageUpload(options);//, this.camera);
     }
     return field;
   }
@@ -204,35 +202,6 @@ export class DynamicFormService {
     return field;
   }
   
-  getFields() {
-    let fields: FieldBase[] = [
-      new FieldMultipleDropdown({
-        key: 'species',
-        label: 'Species',
-        validators: [Validators.required],
-        options: [
-          {key: 'G', value: 'Green Turtle'},
-          {key: 'OR', value: 'Olive Ridley Turtle'},
-          {key: 'HB', value: 'Hawksbill Turtle'},
-          {key: 'LH', value: 'Loggerhead Turtle'},
-          {key: 'LB', value: 'Leatherback Turtle'}
-        ],
-        order: 1
-      }),
-
-      new FieldTextbox({
-        key: 'ccl_cm',
-        label: 'Curved Carapax Length (CCL) in cm',
-        validators: [Validators.required, Validators.min(50), Validators.max(250)],
-        type: 'text',
-        order: 2
-      })
-    ];
-
-    return fields.sort((a, b) => a.order - b.order);
-
-  }
-
   onConnect(){
     let obs = new Observable(observer => {
       this.socket.on('connect', (data) => {
