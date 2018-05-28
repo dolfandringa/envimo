@@ -12,7 +12,7 @@ import { BaseFieldComponent } from './basefield.component';
   </ion-select>
   <button type="button" *ngIf="hasSubForms" ion-button item-end (click)="showSubForms()">Add</button>
   <p item-end *ngIf="!valid" class="errorMessage">
-    <em ion-text color="danger" *ngIf="getErrors().required">Required</em>
+    <em ion-text color="danger" *ngIf="errors.required">Required</em>
   </p>
 </ion-item>
   `

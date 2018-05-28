@@ -42,7 +42,7 @@ export class BaseFieldComponent implements Field{
     }
   }
 
-  getErrors(){
+  get errors(){
     if (this.formGroup !== undefined){
       return this.formGroup.get(this.config.key).errors;
     }

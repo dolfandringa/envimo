@@ -9,7 +9,7 @@ import { BaseFieldComponent } from './basefield.component';
   <ion-label [attr.for]="config.key" floating>{{config.label}}</ion-label>
   <ion-datetime displayFormat="YYYY-MM-DD HH:mm" pickerFormat="D MMM YYYY h:mm a" [formControlName]="config.key" [id]="config.key"></ion-datetime>
   <p item-end *ngIf="!valid" class="errorMessage">
-    <em ion-text color="danger" *ngIf="getErrors().required">Required</em>
+    <em ion-text color="danger" *ngIf="errors.required">Required</em>
   </p>
 </ion-item>
   `

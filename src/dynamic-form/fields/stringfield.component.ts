@@ -9,7 +9,7 @@ import { BaseFieldComponent } from './basefield.component';
   <ion-label [attr.for]="config.key" floating>{{config.label}}</ion-label>
   <ion-input [formControlName]="config.key" [id]="config.key" [type]="config.stringFormat"></ion-input>
   <p item-end *ngIf="!valid" class="errorMessage">
-    <em ion-text color="danger" *ngIf="getErrors().required">Required</em>
+    <em ion-text color="danger" *ngIf="errors.required">Required</em>
   </p>
 </ion-item>
   `
