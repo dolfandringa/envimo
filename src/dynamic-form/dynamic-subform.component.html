@@ -1,0 +1,9 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="formGroup">
+  <ng-container
+    *ngFor="let field of config.fields;"
+    dynamicField
+    [config]="field"
+    [group]="formGroup">
+  </ng-container>
+ <button ion-button type="submit" [disabled]="!formGroup.valid">Add</button>
+</form>
