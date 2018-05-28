@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup }   from '@angular/forms';
 import { NavParams } from 'ionic-angular';
-import { DynamicForm }   from './base';
+import { DynamicForm }   from './dynamic-form';
+import { ViewController } from 'ionic-angular';
  
 
 @Component({
@@ -10,10 +11,11 @@ import { DynamicForm }   from './base';
 export class DynamicSubFormComponent implements OnInit {
 
   form: DynamicForm;
-  payLoad = '';
+  payLoad: string;
   formGroup: FormGroup;
+  value: any;
 
-  constructor(params: NavParams) { 
+  constructor(params: NavParams, public viewCtrl: ViewController) { 
     this.form = params.get('form');
   }
 
@@ -23,6 +25,7 @@ export class DynamicSubFormComponent implements OnInit {
 
   ngOnInit() {
     this.formGroup = this.form.toFormGroup();
+    console.log(this.viewCtrl);
     this.onChanges();
   }
 
@@ -34,7 +37,13 @@ export class DynamicSubFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.payLoad = JSON.stringify(this.formGroup.value);
+    if(this.formGroup.valid){
+      this.payLoad = JSON.stringify(this.form.value);
+      this.value = this.form.value;
+      this.form.valueChanged.next(this.form);
+      console.log("Subform value", this.value);
+      this.viewCtrl.dismiss(this.value);
+    }
   }
 
 }

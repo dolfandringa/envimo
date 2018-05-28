@@ -1,40 +1,92 @@
-import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
 import { PageService } from '../../providers/page-service/page-service';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder }   from '@angular/forms';
+import { DynamicFormService } from '../../providers/dynamic-form/dynamic-form.service';
+
+
+/*@Component({
+  selector: 'page-list',
+  template: `
+  <ion-content>
+    Hallo
+  </ion-content>
+  `
+})
+export class ListPage{
+  constructor(
+    public pageService: PageService
+  ) {
+    this.pageService.pagetitle = "Dag";
+  }
+}
+ */
 
 @Component({
   selector: 'page-list',
-  templateUrl: 'list.html'
+  template:`
+  <ion-content style="margin-top: 70px;">
+  <form [formGroup]="group">
+  <ion-item [formGroup]="group">
+    <ion-label floating for="idfield">Number</ion-label>
+    <ion-input type="text" id="idfield" formControlName="idfield"></ion-input>
+  </ion-item>
+  <ion-item [formGroup]="group">
+    <ion-label floating for="selectfield">Dynamic dropdown</ion-label>
+    <ion-select multiple id="selectfield" formControlName="selectfield">
+      <ion-option *ngFor="let option of baseOptions" [value]="option.value">{{ option.label }}</ion-option>
+    </ion-select>
+  </ion-item>
+  <button ion-button type="submit" [disabled]="!group.valid" (click)='onSubmit()'>Save</button>
+  </form>
+  </ion-content>
+  `
 })
-export class ListPage {
-  selectedItem: any;
-  icons: string[];
-  items: Array<{title: string, note: string, icon: string}>;
-  pagetitle: string = "List";
 
-  constructor(public navCtrl: NavController, public pageService: PageService, public navParams: NavParams) {
-    // If we navigated to this page, we will have an item available as a nav param
-    this.selectedItem = navParams.get('item');
-    this.pageService.pagetitle = 'List';
+export class ListPage implements OnInit{
 
-    // Let's populate this page with some filler content for funzies
-    this.icons = ['flask', 'wifi', 'beer', 'football', 'basketball', 'paper-plane',
-    'american-football', 'boat', 'bluetooth', 'build'];
+  group: FormGroup;
+  baseOptions = [{value: 1, label: 'Chris'}, {value: 2, label: 'Charlie'}]
+  pagetitle: string = "Test Dynamic Options";
 
-    this.items = [];
-    for (let i = 1; i < 11; i++) {
-      this.items.push({
-        title: 'Item ' + i,
-        note: 'This is item #' + i,
-        icon: this.icons[Math.floor(Math.random() * this.icons.length)]
-      });
-    }
+  constructor(
+    public dfs: DynamicFormService,
+    private fb: FormBuilder,
+    public pageService: PageService,
+  ) {
+    this.pageService.pagetitle = this.pagetitle;
   }
 
-  itemTapped(event, item) {
-    // That's right, we're pushing to ourselves!
-    this.navCtrl.push(ListPage, {
-      item: item
+  onSubmit(){
+    console.log("Form value:",this.group.value);
+  }
+
+  ngOnInit(){
+    this.group = this.createGroup();
+    this.group.get('idfield').valueChanges.subscribe((value) => {
+      console.log("selectfield value(s):", this.group.get('selectfield').value);
+      console.log("idfield changed");
+      this.dfs.getNewOptions(value).subscribe((newoptions) => {
+        console.log("Got the following new options:", newoptions);
+        for(let option of newoptions){
+          this.baseOptions.push(option);
+          this.group.get('selectfield').value.push(option.value);
+        }
+        console.log("New form value", this.group.value);
+      });
+    });
+    this.group.get('selectfield').valueChanges.subscribe((value) => {
+      console.log("Select field changed to", value);
     });
   }
+
+  createGroup(){
+    const group = this.fb.group({
+      idfield: [''],
+      selectfield: [[this.baseOptions[0].value, this.baseOptions[1].value]]
+    });
+    return group;
+  }
+
+
 }
+

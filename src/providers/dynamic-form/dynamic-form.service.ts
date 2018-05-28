@@ -1,8 +1,8 @@
 import { Socket } from 'ng-socket-io';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { FieldBase }     from '../dynamic-form-field/base';
-import { DynamicForm }     from '../dynamic-form/base';
+import { FieldBase }     from '../dynamic-form-field/dynamic-form-field';
+import { DynamicForm }     from './dynamic-form';
 import { FieldDateTime, FieldMultipleDropdown, FieldDropdown, FieldTextbox, FieldInteger, FieldNumber } from '../dynamic-form-field/field-types';
 import { FieldImageUpload } from '../dynamic-form-field/field-types';
 import { Validators } from '@angular/forms';
@@ -16,6 +16,22 @@ export class DynamicFormService {
   public forms = {};
   public currentForm: DynamicForm;
   private modals = {};
+
+  getNewOptions(value: number) :Observable<any[]>{
+    let alloptions = {
+      2: [
+        {value: {'firstname': 'Fred', 'lastname': 'Flintstone'}, label: 'Fred'},
+        {value: {'firstname': 'Barney', 'lastname': 'Rubble'}, label: 'Barney'}
+      ],
+      3: [
+        {value: {'type': 'drink', 'name': 'coffee'}, label: 'coffee'},
+        {value: {'type': 'drink', 'name': 'tea'}, label: 'tea'}
+      ]
+    }
+    return new Observable<object[]>((observer) => {
+      observer.next(alloptions[value]);
+    });
+  }
 
   constructor(
     private socket: Socket,
@@ -38,12 +54,17 @@ export class DynamicFormService {
   }
 
   addSubForm(sfkey, data) {
-    this.modals[sfkey] = this.modalCtrl.create(DynamicSubFormComponent, data);
+    let modal = this.modalCtrl.create(DynamicSubFormComponent, data, {showBackdrop: false});
+    this.modals[sfkey] = modal;
+    return modal;
   }
 
 
   showSubForm(sfkey) {
-    this.modals[sfkey].present();
+    let modal = this.modals[sfkey];
+    console.log('Show modal', modal);
+    modal.data.form.reset();
+    modal.present();
   }
 
   getDatasets(){
@@ -60,6 +81,11 @@ export class DynamicFormService {
 
   mapJSONForm(formschema, formkey, mainschema): DynamicForm{
     let form = new DynamicForm(formkey, formschema['title'], new Array());
+    let required = [];
+    if('required' in formschema){
+      required = formschema['required'];
+    }
+    console.log("Required fields:", required);
     for (let propkey in formschema['properties']){
       let prop = formschema['properties'][propkey];
       let field: FieldBase;
@@ -77,6 +103,13 @@ export class DynamicFormService {
       }
       else{
         field = this.mapSimpleField(propkey, prop);
+      }
+      if(required.indexOf(field.key) > -1){
+        console.log("Field", field.key, "is required.");
+        field.validators.push(Validators.required);
+      }
+      else{
+        console.log(field.key, "not in", required);
       }
       console.log("Field", field);
       form.fields.push(field);

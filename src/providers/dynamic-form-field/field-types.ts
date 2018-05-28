@@ -1,4 +1,4 @@
-import { FieldBase } from  './base';
+import { FieldBase } from  './dynamic-form-field';
 
 export class FieldDropdown extends FieldBase{
   controlType = 'dropdown';
@@ -24,6 +24,8 @@ export class FieldMultipleDropdown extends FieldBase{
   constructor(options: {} = {}) {
     super(options);
     this.options = options['options'] || [];
+    this.value = options['value'] || []
+    console.log("Multiple Dropdown value", this.value);
   }
 }
 

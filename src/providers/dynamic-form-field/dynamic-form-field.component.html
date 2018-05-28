@@ -4,17 +4,16 @@
   <ion-select *ngIf="field.controlType=='dropdown'" [id]="field.key" [formControlName]="field.key">
     <ion-option *ngFor="let opt of field.options" [value]="opt.id">{{opt.label}}</ion-option>
   </ion-select>
-  Hallo
   <ion-image-input item-content *ngIf="field.controlType=='imageupload'" [id]="field.key" [formControlName]="field.key"></ion-image-input>
   <ion-select multiple *ngIf="field.controlType=='multipledropdown'" [id]="field.key" [formControlName]="field.key">
-    <ion-option *ngFor="let opt of field.options" [value]="opt.id">{{opt.label}}</ion-option>
+    <ion-option *ngFor="let opt of field.options" [value]="opt.id">{{ opt.label }}</ion-option>
   </ion-select>
   <button type="button" *ngIf="hasSubForms" ion-button item-end (click)="showSubForms()">Add</button>
   <ion-datetime displayFormat="YYYY-MM-DD HH:mm" pickerFormat="D MMM YYYY h:mm a" *ngIf="field.controlType=='datetime'" [id]="field.key" [formControlName]="field.key"></ion-datetime>
-</ion-item>
-<ion-item *ngIf="!isValid" class="errorMessage">
-  <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.required">Required</em>
-  <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.min">{{field.label}} should be at least {{formGroup.get(field.key).errors.min.min}}.</em>
-  <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.max">{{field.label}} should be no more than {{formGroup.get(field.key).errors.max.max}}.</em>
-  <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.email">{{field.label}} should be a valid email address.</em>
+  <p item-end *ngIf="!isValid" class="errorMessage">
+    <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.required">Required</em>
+    <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.min">{{field.label}} should be at least {{formGroup.get(field.key).errors.min.min}}.</em>
+    <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.max">{{field.label}} should be no more than {{formGroup.get(field.key).errors.max.max}}.</em>
+    <em ion-text color="danger" *ngIf="formGroup.get(field.key).errors.email">{{field.label}} should be a valid email address.</em>
+  </p>
 </ion-item>

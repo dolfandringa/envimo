@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { DynamicFormService } from '../dynamic-form/dynamic-form.service';
 import { FormGroup }   from '@angular/forms';
  
-import { FieldBase }     from './base';
+import { FieldBase }     from './dynamic-form-field';
 
 @Component({
   selector: 'app-field',
@@ -34,7 +34,6 @@ export class DynamicFormFieldComponent implements OnInit{
 
   get isValid() { 
     let valid = this.formGroup.controls[this.field.key].valid;
-    console.log("Current field valid?", valid);
     return valid; 
   }
 
