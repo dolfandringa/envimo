@@ -4,7 +4,6 @@ import { FormConfig } from './models/form-config.interface';
 import { FieldConfig } from './models/field-config.interface';
 import { DynamicSubFormComponent } from './dynamic-subform.component';
 import { IntegerValidator } from './fields/validators';
-import { ModalController } from 'ionic-angular';
 
 
 @Injectable()
@@ -12,15 +11,9 @@ export class DynamicFormService {
   private modals = {};
 
   constructor(
-    //public modalCtrl: ModalController,
   ) {
   }
 
-  addSubForm(sfkey, formConfig) {
-    /*let modal = this.modalCtrl.create(DynamicSubFormComponent, {'formconfig': formConfig}, {showBackdrop: false});
-    this.modals[sfkey] = modal;
-    return modal;*/
-  }
 
   getDefinition(schema :object, ref :string) :[string, object]{
     let defname = ref.split('/').pop()

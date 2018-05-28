@@ -72,9 +72,9 @@ export class DynamicFormComponent implements OnInit{
   ngOnInit() {
     this.config = this.dfs.mapJSONSchema(this.datasetSchema)[this.formName];
     this.formGroup = this.createFormGroup();
-    for(let sfkey in this.config.subforms){
-      this.dfs.addSubForm(sfkey, this.config.subforms[sfkey]);
-    }
+    //for(let sfkey in this.config.subforms){
+    //  this.dfs.addSubForm(sfkey, this.config.subforms[sfkey]);
+    //}
   }
 
   onSubmit() {

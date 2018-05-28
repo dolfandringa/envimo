@@ -9,6 +9,9 @@ import { DateTimeFieldComponent } from './fields/datetimefield.component';
 import { IntegerFieldComponent } from './fields/integerfield.component';
 import { NumberFieldComponent } from './fields/numberfield.component';
 
+import { FieldConfig } from './models/field-config.interface';
+import { FormConfig } from './models/form-config.interface';
+
 
 const components = {
   imagefield: ImageFieldComponent,
@@ -24,8 +27,9 @@ const components = {
   selector: '[dynamicField]',
 })
 export class DynamicFieldDirective implements OnInit {
-  @Input() config;
+  @Input() config: FieldConfig;
   @Input() formGroup: FormGroup;
+  @Input() subForms: {[s: string]: FormConfig}
   component;
   
   constructor(
@@ -40,6 +44,7 @@ export class DynamicFieldDirective implements OnInit {
     this.component = this.container.createComponent(factory);
     this.component.instance.config = this.config;
     this.component.instance.formGroup = this.formGroup;
+    this.component.instance.subForms = this.subForms;
     console.log("Component", this.component);
     console.log("Component instance", this.component.instance);
   }

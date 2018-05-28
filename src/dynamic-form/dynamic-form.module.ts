@@ -53,6 +53,7 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
     DateTimeFieldComponent,
     IntegerFieldComponent,
     NumberFieldComponent,
+    DynamicSubFormComponent,
   ]
 })
 export class DynamicFormModule {

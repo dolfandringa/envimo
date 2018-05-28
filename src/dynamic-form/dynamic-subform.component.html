@@ -3,6 +3,7 @@
     *ngFor="let field of config.fields;"
     dynamicField
     [config]="field"
+    [subForms]="config.subforms"
     [formGroup]="formGroup">
   </ng-container>
  <button ion-button type="submit" [disabled]="!formGroup.valid">Add</button>

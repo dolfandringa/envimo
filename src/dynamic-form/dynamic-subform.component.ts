@@ -13,7 +13,7 @@ import { DynamicFormService } from './dynamic-form.service';
 })
 export class DynamicSubFormComponent extends DynamicFormComponent {
 
-  config: FormConfig;
+  formName: string;
 
   constructor(
     private subfb: FormBuilder,
@@ -30,6 +30,10 @@ export class DynamicSubFormComponent extends DynamicFormComponent {
 
   showSubForm(name: string){
     console.log("Nothing to see here.");
+  }
+
+  ngOnInit(){
+    this.formGroup = this.createFormGroup();
   }
 
   onSubmit() {

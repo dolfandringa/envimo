@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { DynamicFormService } from '../dynamic-form.service';
 import { FormGroup }   from '@angular/forms';
 import { FieldConfig } from '../models/field-config.interface';
+import { FormConfig } from '../models/form-config.interface';
 import { Field } from '../models/field.interface';
+import { DynamicSubFormComponent } from '../dynamic-subform.component';
+import { ModalController } from 'ionic-angular';
 
 @Component({
   selector: 'base-field',
@@ -16,9 +18,11 @@ export class BaseFieldComponent implements Field{
 
   config: FieldConfig;
   formGroup: FormGroup;
+  subForms: {[s: string]: FormConfig };
+  modals: {};
 
   constructor(
-    public dfs: DynamicFormService
+    private modalCtrl: ModalController,
   ) {}
 
   get hasSubForms(): boolean{
@@ -34,14 +38,6 @@ export class BaseFieldComponent implements Field{
     }
   }
 
-  showSubForms(){
-    console.log("showSubForms clicked for", this.config.key);
-    for (let sfkey of this.config.subforms){
-      console.log("Got subform for", sfkey);
-      this.dfs.showSubForm(sfkey);
-    }
-  }
-
   get errors(){
     if (this.formGroup !== undefined){
       return this.formGroup.get(this.config.key).errors;
@@ -49,6 +45,36 @@ export class BaseFieldComponent implements Field{
     else{
       return undefined;
     }
+  }
+
+  addSubForms() {
+    console.log("AddSubForms fieldconfig",this.config);
+    if(this.config.subforms !== undefined){
+      this.config.subforms.forEach(sfkey =>{
+        let sfconfig = this.subForms[sfkey];
+        console.log("Adding subform",sfkey,"with config",sfconfig);
+        let modal = this.modalCtrl.create(DynamicSubFormComponent, {'formconfig': sfconfig}, {showBackdrop: false});
+        this.modals[sfkey] = modal;
+      });
+    }
+  }
+
+  showSubForms(){
+    console.log("showSubForms clicked for", this.config.key);
+    if(this.config.subforms !== undefined){
+      this.config.subforms.forEach(sfkey => {
+        console.log("Got subform for", sfkey);
+        console.log("Modal",this.modals[sfkey]);
+        //this.modals[sfkey]._component.reset();
+        this.modals[sfkey].present();
+      });
+    }
+  }
+
+  ngOnInit(){
+    console.log("This", this);
+    this.modals = {};
+    this.addSubForms();
   }
 
 }
