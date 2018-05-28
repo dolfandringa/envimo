@@ -13,11 +13,11 @@ import { NumberFieldComponent } from './fields/numberfield.component';
 const components = {
   imagefield: ImageFieldComponent,
   selectfield: SelectFieldComponent,
-  multipleselectfied: MultipleSelectFieldComponent,
+  multipleselectfield: MultipleSelectFieldComponent,
   stringfield: StringFieldComponent,
   integerfield: IntegerFieldComponent,
   numberfield: NumberFieldComponent,
-  datetimefield: DateTimeFieldComponent
+  datetimefield: DateTimeFieldComponent,
 }
 
 @Directive({
@@ -25,7 +25,7 @@ const components = {
 })
 export class DynamicFieldDirective implements OnInit {
   @Input() config;
-  @Input() group: FormGroup;
+  @Input() formGroup: FormGroup;
   component;
   
   constructor(
@@ -34,10 +34,13 @@ export class DynamicFieldDirective implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log("DynamicFieldDirective fieldType:",this.config.fieldType);
     const component = components[this.config.fieldType];
     const factory = this.resolver.resolveComponentFactory<any>(component);
     this.component = this.container.createComponent(factory);
     this.component.instance.config = this.config;
-    this.component.instance.group = this.group
+    this.component.instance.formGroup = this.formGroup;
+    console.log("Component", this.component);
+    console.log("Component instance", this.component.instance);
   }
 }

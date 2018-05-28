@@ -1,5 +1,5 @@
 
 <ion-content padding>
   <h2>Add observation</h2>
-  <app-dynamic-form></app-dynamic-form>
+  <dynamic-form *ngIf="formSchema!==undefined" formName="Encounter" [datasetSchema]="formSchema"></dynamic-form>
 </ion-content>

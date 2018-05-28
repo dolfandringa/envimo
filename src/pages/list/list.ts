@@ -1,25 +1,7 @@
 import { PageService } from '../../providers/page-service/page-service';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder }   from '@angular/forms';
-import { DynamicFormService } from '../../providers/dynamic-form/dynamic-form.service';
 
-
-/*@Component({
-  selector: 'page-list',
-  template: `
-  <ion-content>
-    Hallo
-  </ion-content>
-  `
-})
-export class ListPage{
-  constructor(
-    public pageService: PageService
-  ) {
-    this.pageService.pagetitle = "Dag";
-  }
-}
- */
 
 @Component({
   selector: 'page-list',
@@ -49,7 +31,6 @@ export class ListPage implements OnInit{
   pagetitle: string = "Test Dynamic Options";
 
   constructor(
-    public dfs: DynamicFormService,
     private fb: FormBuilder,
     public pageService: PageService,
   ) {
@@ -65,6 +46,7 @@ export class ListPage implements OnInit{
     this.group.get('idfield').valueChanges.subscribe((value) => {
       console.log("selectfield value(s):", this.group.get('selectfield').value);
       console.log("idfield changed");
+      /*
       this.dfs.getNewOptions(value).subscribe((newoptions) => {
         console.log("Got the following new options:", newoptions);
         for(let option of newoptions){
@@ -72,8 +54,9 @@ export class ListPage implements OnInit{
           this.group.get('selectfield').value.push(option.value);
         }
         console.log("New form value", this.group.value);
-      });
+      });*/
     });
+       
     this.group.get('selectfield').valueChanges.subscribe((value) => {
       console.log("Select field changed to", value);
     });

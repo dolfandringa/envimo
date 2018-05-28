@@ -1,4 +1,0 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="formGroup">
- <app-field *ngFor="let field of form.fields" [formGroup]="formGroup" [field]="field"></app-field>
- <button ion-button type="submit" [disabled]="!formGroup.valid">Add</button>
-</form>

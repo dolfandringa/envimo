@@ -1,27 +1,26 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder }   from '@angular/forms';
-import { LoadingController } from 'ionic-angular';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
-
  
 
 @Component({
-  selector: 'app-dynamic-form',
-  templateUrl: './dynamic-form.component.html'
+  selector: 'dynamic-form',
+  templateUrl: './dynamic-form.component.html',
 })
 export class DynamicFormComponent implements OnInit{
 
-  @Input() config: FormConfig;
+  @Input() datasetSchema: object;
+  @Input() formName: string;
   @Output() valueChanged: EventEmitter<any> = new EventEmitter<any>();
 
   payLoad: string;
   formGroup: FormGroup;
+  config: FormConfig;
 
   constructor(
-    private loadingCtrl: LoadingController,
-    private fb: FormBuilder,
     public dfs: DynamicFormService,
+    private fb: FormBuilder,
   ) {
   }
 
@@ -71,6 +70,7 @@ export class DynamicFormComponent implements OnInit{
 
 
   ngOnInit() {
+    this.config = this.dfs.mapJSONSchema(this.datasetSchema)[this.formName];
     this.formGroup = this.createFormGroup();
     for(let sfkey in this.config.subforms){
       this.dfs.addSubForm(sfkey, this.config.subforms[sfkey]);

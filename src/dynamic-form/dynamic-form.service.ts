@@ -1,14 +1,10 @@
-import { Socket } from 'ng-socket-io';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { Validators } from '@angular/forms';
-import 'rxjs/add/operator/map';
-import { ModalController } from 'ionic-angular';
 import { FormConfig } from './models/form-config.interface';
 import { FieldConfig } from './models/field-config.interface';
-import { DatasetsConfig } from './models/datasets-config.interface';
 import { DynamicSubFormComponent } from './dynamic-subform.component';
 import { IntegerValidator } from './fields/validators';
+import { ModalController } from 'ionic-angular';
 
 
 @Injectable()
@@ -16,17 +12,14 @@ export class DynamicFormService {
   private modals = {};
 
   constructor(
-    private socket: Socket,
-    //private camera: Camera,
-    public modalCtrl: ModalController
+    //public modalCtrl: ModalController,
   ) {
-    console.log("Started dynamic form service");
-    this.onConnect().subscribe(data => {
-      console.log('Connected');
-      this.socket.emit("message", "Hello World!");
-    });
-    console.log('Connecting to websocket');
-    this.socket.connect();
+  }
+
+  addSubForm(sfkey, formConfig) {
+    /*let modal = this.modalCtrl.create(DynamicSubFormComponent, {'formconfig': formConfig}, {showBackdrop: false});
+    this.modals[sfkey] = modal;
+    return modal;*/
   }
 
   getDefinition(schema :object, ref :string) :[string, object]{
@@ -35,30 +28,12 @@ export class DynamicFormService {
     return [defname, schema['definitions'][defname]];
   }
 
-  addSubForm(sfkey, formConfig) {
-    let modal = this.modalCtrl.create(DynamicSubFormComponent, {'formconfig': formConfig}, {showBackdrop: false});
-    this.modals[sfkey] = modal;
-    return modal;
-  }
-
   showSubForm(sfkey) {
     let modal = this.modals[sfkey];
     console.log('Show modal', modal);
     console.log('Resetting', modal._component);
     modal._component.reset();
     modal.present();
-  }
-
-  getDatasets(): Observable<DatasetsConfig>{
-    return this.socket.fromEvent("newDatasets").map(data => { 
-      let datasets: DatasetsConfig = {};
-      console.log("Got datasets", data);
-      for (let dskey in data){
-        datasets[dskey] = this.mapJSONSchema(data[dskey]);
-      }
-      console.log("Resulting datasets", datasets);
-      return datasets;
-    });
   }
 
   mapJSONForm(formschema, formkey, mainschema): FormConfig{
@@ -98,9 +73,9 @@ export class DynamicFormService {
       else{
         console.log(fieldConfig.key, "not in", required);
       }
-      console.log("FieldConfig", fieldConfig);
       formConfig.fields.push(fieldConfig);
     }
+    console.log('formConfig',formConfig);
     return formConfig;
   }
 
@@ -224,13 +199,4 @@ export class DynamicFormService {
     return fieldConfig;
   }
   
-  onConnect(){
-    let obs = new Observable(observer => {
-      this.socket.on('connect', (data) => {
-        observer.next(data);
-      });
-    });
-    return obs;
-  }
-
 }

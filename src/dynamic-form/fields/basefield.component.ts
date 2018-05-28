@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { DynamicFormService } from '../dynamic-form.service';
 import { FormGroup }   from '@angular/forms';
 import { FieldConfig } from '../models/field-config.interface';
+import { Field } from '../models/field.interface';
 
 @Component({
   selector: 'base-field',
@@ -11,7 +12,7 @@ import { FieldConfig } from '../models/field-config.interface';
 </ion-item>
   `
 })
-export class BaseFieldComponent{
+export class BaseFieldComponent implements Field{
 
   config: FieldConfig;
   formGroup: FormGroup;

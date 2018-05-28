@@ -1,10 +1,10 @@
 <form (ngSubmit)="onSubmit()" [formGroup]="formGroup">
-  <ng-container
+  <ng-template
     *ngFor="let field of config.fields;"
     dynamicField
     [config]="field"
-    [group]="formGroup">
-  </ng-container>
+    [formGroup]="formGroup">
+  </ng-template>
  <button ion-button type="submit" [disabled]="!formGroup.valid">Save</button>
 </form>
 <div *ngIf="payLoad" class="form-row">

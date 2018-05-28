@@ -1,7 +1,0 @@
-<form *ngIf="formsAvailable" (ngSubmit)="onSubmit()" [formGroup]="formGroup">
- <app-field *ngFor="let field of form.fields" [formGroup]="formGroup" [field]="field"></app-field>
- <button ion-button type="submit" [disabled]="!formGroup.valid">Save</button>
-</form>
-<div *ngIf="payLoad" class="form-row">
-  <strong>Saved the following values</strong><br>{{payLoad}}
-</div>
