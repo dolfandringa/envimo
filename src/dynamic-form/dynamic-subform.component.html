@@ -4,7 +4,9 @@
     dynamicField
     [config]="field"
     [subForms]="config.subforms"
-    [formGroup]="formGroup">
+    [formGroup]="formGroup"
+    (fieldAdded) = "addField($event)"
+    >
   </ng-container>
  <button ion-button type="submit" [disabled]="!formGroup.valid">Add</button>
 </form>

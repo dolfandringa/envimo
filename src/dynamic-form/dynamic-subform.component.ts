@@ -34,14 +34,15 @@ export class DynamicSubFormComponent extends DynamicFormComponent {
 
   ngOnInit(){
     this.formGroup = this.createFormGroup();
+    console.log("Initialized formGroup", this.formGroup, "with value", this.formGroup.value);
   }
 
   onSubmit() {
     if(this.valid){
       this.payLoad = JSON.stringify(this.value);
-      this.valueChanged.emit(this);
-      console.log("Subform value", this.value);
-      this.viewCtrl.dismiss(this.value);
+      //this.valueChanged.emit(this);
+      console.log("Dismissing subform. Formgroup value:", this.formGroup.value);
+      this.viewCtrl.dismiss(this);
     }
   }
 

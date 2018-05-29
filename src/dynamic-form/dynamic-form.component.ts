@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder }   from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
+import { BaseFieldComponent } from './fields/basefield.component';
  
 
 @Component({
@@ -17,11 +18,16 @@ export class DynamicFormComponent implements OnInit{
   payLoad: string;
   formGroup: FormGroup;
   config: FormConfig;
+  fields: {[s: string]: BaseFieldComponent} = {};
 
   constructor(
     public dfs: DynamicFormService,
     private fb: FormBuilder,
   ) {
+  }
+
+  addField(field: BaseFieldComponent){
+    this.fields[field.key] = field;
   }
 
   get value(): any{
@@ -30,6 +36,12 @@ export class DynamicFormComponent implements OnInit{
     }
     else{
       return undefined;
+    }
+  }
+
+  get key(): string{
+    if(this.config){
+      return this.config.key;
     }
   }
 
@@ -49,20 +61,19 @@ export class DynamicFormComponent implements OnInit{
   }
 
   toText(){
-    let str: string[]= [];
-    for(let fkey in this.config.fields){
-      let field = this.config.fields[fkey];
-      str.push(field.key);
-      //str.push(field.toText());
+    if(this.fields){
+      let str: string[]= [];
+      for(let fkey in this.fields){
+        let field = this.fields[fkey];
+        str.push(field.toText());
+      }
+      return str.join(', ');
     }
-    return str.join(', ');
   }
 
   createFormGroup() {
     const group = this.fb.group({});
-    console.log("fields: ", this.config.fields);
     this.config.fields.forEach(field => {
-      console.log("field: ", field.key);
       group.addControl(field.key, this.fb.control(field.value || '', field.validators || []));
     });
     return group;
@@ -72,14 +83,11 @@ export class DynamicFormComponent implements OnInit{
   ngOnInit() {
     this.config = this.dfs.mapJSONSchema(this.datasetSchema)[this.formName];
     this.formGroup = this.createFormGroup();
-    //for(let sfkey in this.config.subforms){
-    //  this.dfs.addSubForm(sfkey, this.config.subforms[sfkey]);
-    //}
   }
 
   onSubmit() {
     if(this.valid){
-      this.payLoad = JSON.stringify(this.value);
+      this.payLoad = this.toText();
       this.valueChanged.emit(this);
       console.log("Form value", this.value);
     }

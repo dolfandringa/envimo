@@ -1,9 +1,6 @@
 import { ValidatorFn } from '@angular/forms';
+import { OptionConfig } from './option-config.interface';
 
-export interface OptionConfig {
-    id: any,
-    label: string
-}
 
 export interface FieldConfig {
     key: string,
