@@ -12,7 +12,7 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ],
 	imports: [IonicModule],
-  bootstrap: [IonicApp],
+  //bootstrap: [IonicApp],
 	exports: [IonImageInputComponent]
 })
 export class IonImageInputModule {}

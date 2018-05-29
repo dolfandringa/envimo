@@ -14,7 +14,7 @@ import { PageService } from '../providers/page-service/page-service';
 
 import { SocketIoModule, SocketIoConfig } from 'ng-socket-io';
 
-const config: SocketIoConfig = { url: 'http://10.0.8.231:8080', options: {} };
+const config: SocketIoConfig = { url: 'http://127.0.0.1:8080', options: {} };
 //const config: SocketIoConfig = { url: 'http://127.0.0.1:8080', options: {transports: ['websocket','polling']} };
 //const config: SocketIoConfig = { url: 'http://127.0.0.1:8080', options: {} };
 

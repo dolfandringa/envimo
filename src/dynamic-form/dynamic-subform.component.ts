@@ -1,35 +1,84 @@
-import { Component } from '@angular/core';
-import { FormBuilder }   from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder }   from '@angular/forms';
 import { NavParams } from 'ionic-angular';
 import { ViewController } from 'ionic-angular';
 
 import { FormConfig } from './models/form-config.interface';
-import { DynamicFormComponent } from './dynamic-form.component';
 import { DynamicFormService } from './dynamic-form.service';
+import { BaseFieldComponent } from './fields/basefield.component';
  
 
 @Component({
   templateUrl: './dynamic-subform.component.html',
 })
-export class DynamicSubFormComponent extends DynamicFormComponent {
+export class DynamicSubFormComponent implements OnInit {
 
-  formName: string;
+  payLoad: string;
+  formGroup: FormGroup;
+  config: FormConfig;
+  fields: {[s: string]: BaseFieldComponent} = {};
 
   constructor(
-    private subfb: FormBuilder,
-    public subdfs: DynamicFormService,
+    public dfs: DynamicFormService,
+    private fb: FormBuilder,
     public params: NavParams,
-    public viewCtrl: ViewController
-  ) { 
-    super(
-      subdfs,
-      subfb,
-    );
+    public viewCtrl: ViewController,
+  ) {
     this.config = params.get('formconfig');
   }
 
-  showSubForm(name: string){
-    console.log("Nothing to see here.");
+  get value(): any{
+    if (this.formGroup !== undefined){
+      return this.formGroup.value;
+    }
+    else{
+      return undefined;
+    }
+  }
+
+  get key(): string{
+    if(this.config){
+      return this.config.key;
+    }
+  }
+
+  get valid(): boolean{
+    if(this.formGroup !== undefined){
+      return this.formGroup.valid;
+    }
+    else{
+      return false;
+    }
+  }
+
+  reset(){
+    if(this.formGroup !== undefined){
+      this.formGroup.reset();
+    }
+  }
+
+  toText(){
+    if(this.fields){
+      let str: string[]= [];
+      for(let fkey in this.fields){
+        let field = this.fields[fkey];
+        str.push(field.toText());
+      }
+      return str.join(', ');
+    }
+  }
+
+  createFormGroup() {
+    const group = this.fb.group({});
+    this.config.fields.forEach(field => {
+      console.log("Field value:",field.value);
+      group.addControl(field.key, this.fb.control(field.value || '', field.validators || []));
+    });
+    return group;
+  }
+
+  addField(field: BaseFieldComponent){
+    this.fields[field.key] = field;
   }
 
   ngOnInit(){
@@ -39,7 +88,7 @@ export class DynamicSubFormComponent extends DynamicFormComponent {
 
   onSubmit() {
     if(this.valid){
-      this.payLoad = JSON.stringify(this.value);
+      this.payLoad = this.toText();
       //this.valueChanged.emit(this);
       console.log("Dismissing subform. Formgroup value:", this.formGroup.value);
       this.viewCtrl.dismiss(this);

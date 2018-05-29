@@ -17,6 +17,6 @@ import { BaseFieldComponent } from './basefield.component';
 export class ImageFieldComponent extends BaseFieldComponent{
 
   toText(): string{
-    return '<img src="'+this.value+'" />';
+    return '<img width="50px" src="'+this.value+'" />';
   }
 }

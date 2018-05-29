@@ -1,5 +1,6 @@
 
 export interface OptionConfig {
     id: any,
-    label: string
+    label: string,
+    selected?: boolean,
 }

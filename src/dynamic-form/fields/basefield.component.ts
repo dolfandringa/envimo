@@ -7,6 +7,7 @@ import { Field } from '../models/field.interface';
 import { DynamicSubFormComponent } from '../dynamic-subform.component';
 import { DynamicFormComponent } from '../dynamic-form.component';
 import { ModalController } from 'ionic-angular';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'base-field',
@@ -25,6 +26,7 @@ export class BaseFieldComponent implements Field{
 
   constructor(
     private modalCtrl: ModalController,
+    private sanitizer: DomSanitizer,
   ) {}
 
   get hasSubForms(): boolean{
@@ -69,7 +71,7 @@ export class BaseFieldComponent implements Field{
     console.log("Old field:", this);
     console.log("Old field value:", this.value);
     if(this.value instanceof Array){
-      let option: OptionConfig = {id: form.value, label: form.toText()};
+      let option: OptionConfig = {id: form.value, label: form.toText(), selected: true};
       console.log("Adding option:", option);
       this.config.options.push(option);
       console.log("Adding value:", form.value);
