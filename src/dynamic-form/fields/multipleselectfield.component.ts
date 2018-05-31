@@ -39,7 +39,7 @@ export class MultipleSelectFieldComponent extends BaseFieldComponent{
     let idx = this.value.indexOf(opt.id);
     console.log("Removing value",idx);
     this.value.splice(idx, 1);
-    let idx = this.config.options.indexOf(opt);
+    idx = this.config.options.indexOf(opt);
     console.log("Removing option",idx);
     this.config.options.splice(idx, 1);
     console.log(this.value);

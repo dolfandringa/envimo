@@ -1,3 +1,8 @@
 <!-- Generated template for the IonImageInputComponent component -->
-<img width="50px" [src]="domSanitizer.bypassSecurityTrustUrl(imageData)" /><button ion-button item-end type="button" (click)="getPicture()">Get picture</button>
+<ion-list>
+  <img *ngIf="lastImage" ion-item width="50px" [src]="pathForImage(this.lastImage)" />
+  <ion-item>
+    <button ion-button item-end type="button" (click)="chooseSource()">Get picture</button>
+  </ion-item>
+</ion-list>
 

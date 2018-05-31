@@ -1,14 +1,16 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonImageInputComponent } from './ion-image-input.component';
-import { ImagePicker } from '@ionic-native/image-picker';
-import { Base64 } from '@ionic-native/base64';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { File } from '@ionic-native/file';
+import { FilePath } from '@ionic-native/file-path';
+import { Camera } from '@ionic-native/camera';
 
 @NgModule({
   declarations: [IonImageInputComponent],
   providers: [
-    ImagePicker,
-    Base64,
+    Camera,
+    File,
+    FilePath,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ],
 	imports: [IonicModule],

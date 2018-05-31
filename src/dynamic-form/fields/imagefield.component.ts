@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
 import { BaseFieldComponent } from './basefield.component';
- 
+
+
+declare var cordova: any;
 
 @Component({
   selector: 'image-field',
+  styles: [
+    "ion-image-input.component.scss"
+  ],
   template: `
 <ion-item [formGroup]="formGroup">
   <ion-label [attr.for]="config.key" floating>{{config.label}}</ion-label>
@@ -16,7 +21,17 @@ import { BaseFieldComponent } from './basefield.component';
 })
 export class ImageFieldComponent extends BaseFieldComponent{
 
+
+  public pathForImage(img){
+    if (img === null){
+      return '';
+    }
+    else{
+      return cordova.file.dataDirectory + img;
+    }
+  }
+
   toText(): string{
-    return '<img width="50px" src="'+this.value+'" />';
+    return '<img src="'+this.pathForImage(this.value)+'" />';
   }
 }

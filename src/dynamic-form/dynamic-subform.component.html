@@ -1,3 +1,4 @@
+<ion-content>
 <form (ngSubmit)="onSubmit()" [formGroup]="formGroup">
   <ng-container
     *ngFor="let field of config.fields;"
@@ -10,3 +11,4 @@
   </ng-container>
  <button ion-button type="submit" [disabled]="!formGroup.valid">Add</button>
 </form>
+</ion-content>
