@@ -1,7 +1,6 @@
-import { Socket } from 'ng-socket-io';
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { PageService } from '../../providers/page-service/page-service';
+import { LoadingController, Loading } from 'ionic-angular';
 
 @Component({
   selector: 'page-home',
@@ -11,37 +10,54 @@ export class HomePage implements OnInit{
 
   datasets: object;
   formSchema: object;
+  loading: Loading;
 
   constructor(
     public pageService: PageService,
-    private socket: Socket,
+    public loadingCtrl: LoadingController,
   ) {
-    this.pageService.pagetitle = 'Home';
-    this.onConnect().subscribe(data => {
-      console.log('Connected');
-      this.socket.emit("message", "Hello World!");
+  }
+
+  startLoadingFirstDatasets() {
+    this.loading = this.loadingCtrl.create({
+      content: "Loading first datasets when a connection with the server is available. Please wait..."
     });
-    console.log('Connecting to websocket');
-    this.socket.connect();
+    this.loading.present();
+    this.pageService.newDatasetsAvailable.subscribe(() => {
+      console.log("newDatasetsAvailable");
+      this.datasets = this.pageService.getDatasets();
+      console.log("loaded datasets", this.datasets);
+      this.formSchema = this.datasets['Pawikan'];
+      this.loading.dismiss();
+    });
+  }
+
+  startLoading() {
+    this.loading = this.loadingCtrl.create({
+      content: "Loading app, please wait..."
+    });
+    this.loading.present();
+    this.pageService.ready.subscribe(() => {
+      let datasets = this.pageService.getDatasets();
+      this.loading.dismiss();
+      if(datasets !== null){
+        console.log("loaded datasets", this.datasets);
+        this.datasets = datasets;
+        this.formSchema = this.datasets['Pawikan'];
+      }
+      else{
+        this.startLoadingFirstDatasets();
+      }
+    });
+  }
+
+  stopLoading() {
+    this.loading.dismiss();
   }
 
   ngOnInit(){
-    this.socket.fromEvent("newDatasets").subscribe((datasets) => {
-      console.log('newDatasets triggered with datasets', datasets);
-      this.datasets = datasets;
-      this.formSchema = datasets['Pawikan'];
-      console.log('Loading form', this.formSchema);
-    });
+    this.pageService.pagetitle = 'Home';
+    this.startLoading();
   }
   
-  onConnect(){
-    let obs = new Observable(observer => {
-      this.socket.on('connect', (data) => {
-        observer.next(data);
-      });
-    });
-    return obs;
-  }
-
-
 }
