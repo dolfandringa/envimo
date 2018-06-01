@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from '../storage-service/storage-service';
 import { Subject }    from 'rxjs';
+import "rxjs/add/operator/takeWhile";
 
 
 /*
@@ -13,13 +14,18 @@ import { Subject }    from 'rxjs';
 export class PageService {
   pagetitle: string;
   authenticated: boolean;
-  ready = new Subject<null>();
-  newDatasetsAvailable = new Subject<null>();
   datasets: object;
   jwt: string;
+  ready = new Subject<null>();
+  newDatasetsAvailable = new Subject<null>();
+  loginError = new Subject<null>();
+  private active: boolean = true;
 
   constructor(private storageService: StorageService) {
-    this.initialize();
+  }
+
+  public deactivate(){
+    this.active = false;
   }
 
   public getDatasets(){
@@ -29,21 +35,34 @@ export class PageService {
   
   public initialize(){
     console.log("Initializing");
-    Promise.all([
-      this.storageService.getJWT(),
-      this.storageService.getDatasets(),
-    ]).then(value => {
-      console.log("Finished initializing");
-      this.authenticated = value[0]!==undefined;
-      this.jwt = value[0];
-      this.datasets = value[1];
-      this.storageService.newDatasetsAvailable.subscribe(() => {
+    this.active = true;
+    this.storageService.JWTLoginError
+      .takeWhile(() => this.active)
+      .subscribe((error: string) => {
+        console.log('Got a login error');
+        this.loginError.next();
+      });
+    this.storageService.newDatasetsAvailable
+      .takeWhile(() => this.active)
+      .subscribe(() => {
+        console.log("New datasets available. Getting them now.");
         this.storageService.getDatasets().then((datasets) => {
           console.log('New datasets', datasets);
           this.datasets = datasets;
           this.newDatasetsAvailable.next();
         });
       });
+    Promise.all([
+      this.storageService.getJWT(),
+      this.storageService.getDatasets(),
+    ]).then(value => {
+      console.log("Finished initializing. jwt", value[0], "datasets", value[1]);
+      console.log("Attempting websocket connection");
+      this.storageService.createSocket();
+      this.authenticated = value[0]!==undefined;
+      this.jwt = value[0];
+      this.datasets = value[1];
+      console.log("Ready");
       this.ready.next();
     });
   }

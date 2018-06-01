@@ -15,13 +15,4 @@
 
 </ion-menu>
 
-<ion-header>
-  <ion-navbar color="primary">
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <ion-title>{{pageService.pagetitle}}</ion-title>
-  </ion-navbar>
-</ion-header>
-
-<ion-nav [root]="rootPage" #content swipeBackEnabled="flase"></ion-nav>
+<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>
