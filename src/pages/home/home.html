@@ -8,5 +8,5 @@
 </ion-header>
 
 <ion-content padding>
-  <dynamic-form *ngIf="formSchema!==undefined" formName="Encounter" [datasetSchema]="formSchema"></dynamic-form>
+  <dynamic-form (valueChanged)="saveForm($event)" *ngIf="formSchema!==undefined" formName="Encounter" [datasetSchema]="formSchema"></dynamic-form>
 </ion-content>
