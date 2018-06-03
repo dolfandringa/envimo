@@ -47,17 +47,28 @@ export class HomePage implements OnInit{
       this.loadingActive = true;
       let formname = form.formName;
       this.pageService.saveData(this.datasetName, formname, form.value)
-        .takeWhile(() => this.active)
-        .subscribe(() => {
-          if(this.loadingActive){
-            this.loading.dismiss();
-          }
-          this.toastCtrl.create({
-            message: "Data was saved successfully. It will be uploaded when internet is available.",
-            duration: 3000,
-            position: 'top'
-          }).present();
-        });
+        .then(
+          () => {
+            if(this.loadingActive){
+              this.loading.dismiss();
+            }
+            this.toastCtrl.create({
+              message: "Data was saved successfully. It will be uploaded when internet is available.",
+              duration: 3000,
+              position: 'top'
+            }).present();
+          },
+          (err) => {
+            console.error(err);
+            if(this.loadingActive){
+              this.loading.dismiss();
+            }
+            this.toastCtrl.create({
+              message: "Error saving the data. Please report his to the developers.",
+              duration: 3000,
+              position: 'top'
+            }).present();
+          });
     });
   }
 

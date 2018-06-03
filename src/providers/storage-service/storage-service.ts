@@ -4,6 +4,7 @@ import { Storage } from '@ionic/storage';
 import { Subject }    from 'rxjs';
 import "rxjs/add/operator/takeWhile";
 import { environment } from '@environment';
+import { v4 as uuidv4 } from 'uuid';
 
 
 /*
@@ -32,9 +33,12 @@ function createSocket(jwt){
 export class StorageService {
   newDatasetsAvailable = new Subject<null>();
   JWTLoginError = new Subject<string>();
+  uploadError = new Subject<string>();
+  queueChange = new Subject<number>();
   newTokenAvailable = new Subject<null>();
-  dataSaved = new Subject<null>();
   connected = new Subject<null>();
+  jwt: string;
+  private uploading: boolean = false;
   private socket_active: boolean = false;
   private _connected: boolean = false;
   private connectionInProgress: boolean = false;
@@ -65,10 +69,19 @@ export class StorageService {
         this.storage.set('dataQueue', []);
       }
     });
+    this.storage.get("JWT").then((jwt) => {
+      if(jwt === undefined || jwt == null){
+        let message = "No token defined yet. Please login first.";
+        this.JWTLoginError.next(message);
+        console.info(message);
+      }
+      this.jwt = jwt;
+    })
   }
 
   stopSocket(){
     this.socket_active = false;
+    this.socket.removeAllListeners();
   }
 
   createSocket(){
@@ -82,22 +95,13 @@ export class StorageService {
       console.log("Connection in progress. Not creating a new connection.");
       return
     }
-    this.getJWT().then((jwt) => {
-      if(jwt === undefined || jwt == null){
-        let message = "No token defined yet. Please login first.";
-        this.JWTLoginError.next(message);
-        console.info(message);
-        return;
-      }
-      console.log("Creating socket with jwt", jwt);
-      let injector = Injector.create([{
-        provide: Socket,
-        useFactory:createSocket(jwt),
-        deps: []}])
-      this.socket = injector.get(Socket);
-      this.connectSocket();    
-    });
-
+    console.log("Creating socket with jwt", this.jwt);
+    let injector = Injector.create([{
+      provide: Socket,
+      useFactory:createSocket(this.jwt),
+      deps: []}])
+    this.socket = injector.get(Socket);
+    this.connectSocket();    
   }
 
   connectSocket(){
@@ -109,6 +113,7 @@ export class StorageService {
         console.info('Websocket connected');
         this._connected = true;
         this.connectionInProgress = false;
+        this.uploadData();
         this.connected.next();
       });
     this.socket.fromEvent("reconnect_failed")
@@ -161,6 +166,14 @@ export class StorageService {
           this.newTokenAvailable.next();
         });
       });
+    this.queueChange
+      .takeWhile(() => this.socket_active)
+      .subscribe((ql) => {
+        console.log("Queue length changed to", ql);
+        if(this._connected && !this.uploading){
+          this.uploadData();
+        }
+      });
     this.socket.connect();
   }
 
@@ -169,7 +182,7 @@ export class StorageService {
   }
 
   getJWT() {
-    return this.storage.get('JWT');
+    return this.jwt;
   }
 
   storeDatasets(datasets) {
@@ -180,18 +193,69 @@ export class StorageService {
     });
   }
 
+  uploadData(){
+    console.log("Starting data upload.");
+    this.uploading = true;
+    this.storage.get('dataQueue').then((dataQueue) => {
+      if(dataQueue.length>0){
+        let uuid = dataQueue[0];
+        this.storage.get(uuid).then((item) => {
+          let senditem = {
+            form: item['formname'],
+            dataset: item['datasetname'],
+            formdata: item['data']
+          }
+          this.socket.emit('saveData', senditem, (result) => {
+            this.uploading = false;
+            console.log("Finished emitting, result:",result);
+            if(result['success']){
+              this.storage.get('dataQueue').then((oldQueue) => {
+                let i = oldQueue.indexOf(uuid);
+                console.log("Removing",uuid,", index",i,"from the old queue",oldQueue);
+                oldQueue.splice(i, 1);
+                console.log("New queue", oldQueue);
+                this.storage.set('dataQueue', oldQueue).then(() => {
+                  this.queueChange.next(oldQueue.length);
+                  this.storage.remove(uuid);
+                });
+              }).catch((err) => {
+                console.error("Failed saving dataQueue");
+              });
+            }
+            else{
+              console.error("Error uploading data:", result['message']);
+              this.uploadError.next(result['message']);
+            }
+          });
+        });
+      }
+      else{
+        this.uploading = false;
+        console.log("Nothing to upload.");
+      }
+    });
+  }
+
   storeData(datasetname, formname, data) {
-    console.log('Storing submitted data for dataset',datasetname,'and form',formname,':', data);
-    this.storage.get('dataQueue').then((dataQueue: any[]) => {
+    return new Promise((resolve, reject) => {
+      let uuid = uuidv4();
+      console.log('Storing submitted data for dataset',datasetname,'and form',formname,':', data,"with uuid",uuid);
       let item = {datasetname: datasetname, formname: formname, data: data};
-      console.log("Pushing item onto dataQueue:", item);
-      dataQueue.push(item);
-      this.storage.set('dataQueue', dataQueue).then(() => {
-        console.log('Data saved successfully');
-        this.dataSaved.next();
+      this.storage.set(uuid, item).then(() => {
+        this.storage.get('dataQueue').then((dataQueue: string[]) => {
+          console.log("Pushing ",uuid,"onto dataQueue");
+          dataQueue.push(uuid);
+          this.storage.set('dataQueue', dataQueue).then(() => {
+            console.log('Data saved successfully');
+            this.queueChange.next(dataQueue.length);
+            resolve();
+          }).catch((err) => {
+            console.error("Failed storing dataQueue", err);
+            reject("Failed storing data in queue.");
+          });
+        });
       });
     });
-    return this.dataSaved;
   }
 
   getDatasets() {

@@ -12,7 +12,5 @@ module.exports = function () {
       useDefaultConfig[process.env.IONIC_ENV].resolve.alias = {
                 "@environment": path.resolve(__dirname + '/../config/config.' + config_env + '.ts'),
                     };
-      console.log("useDefaultConfig",useDefaultConfig[process.env.IONIC_ENV]);
-      console.log("config_env",config_env);
       return useDefaultConfig;
 };

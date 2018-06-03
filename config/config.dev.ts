@@ -6,5 +6,5 @@
 export const environment = {
   production: false,
   envName: "dev",
-  backend_uri: 'https://127.0.0.1:8080'
+  backend_uri: 'http://127.0.0.1:8080'
 };
