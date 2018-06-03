@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from '../storage-service/storage-service';
+import { Platform } from 'ionic-angular';
 import { Subject }    from 'rxjs';
 import { Network } from '@ionic-native/network';
 import "rxjs/add/operator/takeWhile";
@@ -29,14 +30,11 @@ export class PageService {
   constructor(
     private storageService: StorageService,
     private network: Network,
+    private platform: Platform,
   ) {
     this.ready.subscribe(() => {
       this._ready = true
     });
-    if(network.type != 'none'){
-      console.log("Connection already active");
-      this.connectionAvailable = true;
-    }
     network.onConnect()
       .subscribe(() => {
         console.log("Network connection active");
@@ -46,6 +44,20 @@ export class PageService {
           this.storageService.createSocket();
         }
       });
+  }
+
+  checkOnline(){
+    console.log("Network type", this.network.type);
+    if(this.platform.is('cordova')){
+      if(this.network.type != 'none' && this.network.type != 'unkown'){
+        console.log("Connection already active");
+        this.connectionAvailable = true;
+      }
+    }
+    else{
+       this.connectionAvailable = navigator.onLine;
+    }
+    console.log("Are we online:", this.connectionAvailable)
   }
 
   public deactivate(){
@@ -63,6 +75,7 @@ export class PageService {
   
   public initialize(){
     console.log("Initializing");
+    this.checkOnline()
     this._ready = false;
     this.active = true;
     this.storageService.getQueueLength().then((queueLength: number) => {

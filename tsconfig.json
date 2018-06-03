@@ -4,6 +4,10 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+        "@environment": ["config/config.prod"]
+    },
     "lib": [
       "dom",
       "es2015"
@@ -14,7 +18,8 @@
     "target": "es5"
   },  
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "config/*.ts"
   ],  
   "exclude": [
     "node_modules",

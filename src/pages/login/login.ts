@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, Loading, IonicPage, NavController, NavParams } from 'ionic-angular';
+import { LoadingController, Loading, ToastController, IonicPage, NavController, NavParams } from 'ionic-angular';
 import { FormGroup, FormBuilder, Validators }   from '@angular/forms';
 import { PageService } from '../../providers/page-service/page-service';
 import { HttpClient } from '@angular/common/http';
 import { StorageService } from '../../providers/storage-service/storage-service';
 import { HomePage } from '../home/home';
+import { environment } from '@environment';
 
 /**
  * Generated class for the LoginPage page.
@@ -23,6 +24,7 @@ export class LoginPage implements OnInit{
   loginForm: FormGroup;
   loginError: string;
   loading: Loading;
+  backend_uri: string = environment.backend_uri;
 
   constructor(
     private storageService: StorageService,
@@ -32,6 +34,7 @@ export class LoginPage implements OnInit{
     public pageService: PageService,
     private http: HttpClient,
     private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController,
   ) {
   }
   
@@ -53,18 +56,27 @@ export class LoginPage implements OnInit{
       content: "Logging in. Please wait...",
     })
     this.loading.present().then(() => {
-      this.http.post<object>('http://127.0.0.1:8080/login_app', this.loginForm.value).subscribe((data) => {
-        console.log("Login result:", data);
-        this.loading.dismiss();
-        if(!data['success']){
-          this.loginError = data['message'];
-        }
-        else{
-          this.storageService.setJWT(data['token']).then(() => {
-            this.navCtrl.pop();//push(HomePage,{},{direction: 'back'});
-          });
-        }
-      });
+      this.http.post<object>(this.backend_uri+"/login_app", this.loginForm.value)
+        .subscribe((data) => {
+          console.log("Login result:", data);
+          this.loading.dismiss();
+          if(!data['success']){
+            this.loginError = data['message'];
+          }
+          else{
+            this.storageService.setJWT(data['token']).then(() => {
+              this.navCtrl.pop();//push(HomePage,{},{direction: 'back'});
+            });
+          }
+        }, (error) => {
+          this.loading.dismiss();
+          this.loginError = "Failed reaching server.";
+          this.toastCtrl.create({
+            message: "Failed to connect to the login page. Do you have an internet connection? This is required for the first time login only.",
+            position: 'top',
+            duration: 3000
+          }).present();
+        });
     });
   }
 

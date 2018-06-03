@@ -12,7 +12,8 @@
     "ionic:serve": "ionic-app-scripts serve"
   },
   "config": {
-    "ionic_sass": "./config/sass.config.js"
+    "ionic_sass": "./config/sass.config.js",
+    "ionic_webpack": "./config/webpack.config.js"
   },
   "dependencies": {
     "@angular/common": "5.0.3",

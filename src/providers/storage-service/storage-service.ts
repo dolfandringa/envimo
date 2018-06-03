@@ -3,6 +3,7 @@ import { SocketIoConfig, Socket } from 'ng-socket-io';
 import { Storage } from '@ionic/storage';
 import { Subject }    from 'rxjs';
 import "rxjs/add/operator/takeWhile";
+import { environment } from '@environment';
 
 
 /*
@@ -13,13 +14,9 @@ import "rxjs/add/operator/takeWhile";
  */
 
 class MySocketService extends Socket {
-  //const config: SocketIOConfig;
-//const config: SocketIoConfig = { url: 'http://127.0.0.1:8080', options: {} };
-//const config: SocketIoConfig = { url: 'http://10.99.226.191:8080', options: {} };
-//const config: SocketIoConfig = { url: 'http://127.0.0.1:8080', options: {transports: ['websocket','polling']} };
-//const config: SocketIoConfig = { url: 'http://127.0.0.1:8080', options: {} };
   constructor(jwt: string){
-    let config: SocketIoConfig = {url: 'http://127.0.0.1:8080', options: {query: {token: jwt}}}
+    console.log("Environment", environment);
+    let config: SocketIoConfig = {url: environment.backend_uri, options: {query: {token: jwt}}}
     console.log("Creating websocket with config", config);
     super(config);
   }

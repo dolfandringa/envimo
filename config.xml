@@ -93,4 +93,6 @@
     <allow-navigation href="http://10.99.226.191:8100" />
     <plugin name="cordova-sqlite-storage" spec="^2.3.2" />
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
+    <allow-navigation href="http://192.168.254.147:8100" />
+    <allow-navigation href="http://192.168.43.99:8100" />
 </widget>
