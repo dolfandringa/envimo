@@ -104,6 +104,9 @@ export class PageService {
     ]).then(value => {
       console.log("Finished initializing. jwt", value[0], "datasets", value[1]);
       this.authenticated = value[0]!==undefined;
+      if(value[0] == null || value[0] === undefined){
+        this.loginError.next();
+      }
       this.jwt = value[0];
       this.datasets = value[1];
       console.log("Ready");
