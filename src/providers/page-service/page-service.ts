@@ -110,7 +110,7 @@ export class PageService {
       this.jwt = value[0];
       this.datasets = value[1];
       console.log("Ready");
-      if(this.connectionAvailable){
+      if(this.connectionAvailable && this.jwt != null && this.jwt !== undefined){
         console.log("Attempting websocket connection");
         this.storageService.createSocket();
       }

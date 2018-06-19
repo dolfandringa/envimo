@@ -5,7 +5,11 @@ import { Subject }    from 'rxjs';
 import "rxjs/add/operator/takeWhile";
 import { environment } from '@environment';
 import { v4 as uuidv4 } from 'uuid';
+import { Base64 } from '@ionic-native/base64';
+import { File } from '@ionic-native/file';
+import { FilePath } from '@ionic-native/file-path';
 
+declare var cordova: any;
 
 /*
   Generated class for the StorageServiceProvider provider.
@@ -46,9 +50,21 @@ export class StorageService {
 
   constructor(
     private storage: Storage,
+    private base64: Base64,
+    private file: File,
+    private filePath: FilePath,
   ) {
     console.log('StorageService starting');
     this.initValues();
+  }
+
+  public getPathForImage(img){
+    if (img === null){
+      return '';
+    }
+    else{
+      return cordova.file.dataDirectory + img;
+    }
   }
 
   getQueueLength(){
@@ -63,20 +79,29 @@ export class StorageService {
     });
   }
 
-  initValues(){
-    this.storage.get('dataQueue').then((dataQueue) => {
-      if (dataQueue === undefined || dataQueue == null){
-        this.storage.set('dataQueue', []);
-      }
-    });
-    this.storage.get("JWT").then((jwt) => {
+  loadJWT(){
+    console.log("Loading JWT from storage");
+    return this.storage.get("JWT").then((jwt) => {
       if(jwt === undefined || jwt == null){
         let message = "No token defined yet. Please login first.";
         this.JWTLoginError.next(message);
         console.info(message);
       }
       this.jwt = jwt;
-    })
+    });
+  }
+
+  loadDataQueue(){
+    return this.storage.get('dataQueue').then((dataQueue) => {
+      if (dataQueue === undefined || dataQueue == null){
+        this.storage.set('dataQueue', []);
+      }
+    });
+
+  }
+
+  initValues(){
+    return Promise.all([this.loadJWT(), this.loadDataQueue()]);
   }
 
   stopSocket(){
@@ -101,7 +126,7 @@ export class StorageService {
       useFactory:createSocket(this.jwt),
       deps: []}])
     this.socket = injector.get(Socket);
-    this.connectSocket();    
+    this.connectSocket();
   }
 
   connectSocket(){
@@ -193,6 +218,43 @@ export class StorageService {
     });
   }
 
+  private base64EncodeFiles(data: object){
+    let promises = new Array();
+    let newdata = {};
+    console.log('Base64 encoding data', data);
+    for(let key in data){
+      if(typeof data[key] === "string" && data[key].indexOf('file://')==0){
+        console.log('Convert file to base64 for',key);
+        let prom = this.getBase64String(data[key]).then((result) => {
+          newdata[key] = result;
+          console.log("Finished encoding file to", result);
+        });
+        promises.push(prom);
+      }
+      else if(data[key] instanceof Object){
+        let prom = this.base64EncodeFiles(data[key]).then((result) => {
+          newdata[key] = result;
+          console.log("Finished encoding object to", result);
+        });
+        promises.push(prom);
+      }
+      else{
+        newdata[key] = data[key];
+      }
+    }
+    return Promise.all(promises).then(() => {
+      return newdata;
+    });
+  }
+
+  private getBase64String(fileuri: string){
+    let sourcePath = this.getPathForImage(fileuri.replace('file://',''));
+    return this.base64.encodeFile(sourcePath).then((base64Str: string) => {
+      console.log(base64Str);
+      return base64Str;
+    });
+  }
+
   uploadData(){
     console.log("Starting data upload.");
     this.uploading = true;
@@ -200,32 +262,37 @@ export class StorageService {
       if(dataQueue.length>0){
         let uuid = dataQueue[0];
         this.storage.get(uuid).then((item) => {
-          let senditem = {
-            form: item['formname'],
-            dataset: item['datasetname'],
-            formdata: item['data']
-          }
-          this.socket.emit('saveData', senditem, (result) => {
-            this.uploading = false;
-            console.log("Finished emitting, result:",result);
-            if(result['success']){
-              this.storage.get('dataQueue').then((oldQueue) => {
-                let i = oldQueue.indexOf(uuid);
-                console.log("Removing",uuid,", index",i,"from the old queue",oldQueue);
-                oldQueue.splice(i, 1);
-                console.log("New queue", oldQueue);
-                this.storage.set('dataQueue', oldQueue).then(() => {
-                  this.queueChange.next(oldQueue.length);
-                  this.storage.remove(uuid);
+          let dsname = item['datasetname'];
+          let fname = item['formname'];
+          this.base64EncodeFiles(item['data']).then((encodeResult) => {
+            console.log('Finished encoding', encodeResult);
+            let senditem = {
+              form: fname,
+              dataset: dsname,
+              formdata: encodeResult
+            }
+            this.socket.emit('saveData', senditem, (result) => {
+              this.uploading = false;
+              console.log("Finished emitting, result:",result);
+              if(result['success']){
+                this.storage.get('dataQueue').then((oldQueue) => {
+                  let i = oldQueue.indexOf(uuid);
+                  console.log("Removing",uuid,", index",i,"from the old queue",oldQueue);
+                  oldQueue.splice(i, 1);
+                  console.log("New queue", oldQueue);
+                  this.storage.set('dataQueue', oldQueue).then(() => {
+                    this.queueChange.next(oldQueue.length);
+                    this.storage.remove(uuid);
+                  });
+                }).catch((err) => {
+                  console.error("Failed saving dataQueue");
                 });
-              }).catch((err) => {
-                console.error("Failed saving dataQueue");
-              });
-            }
-            else{
-              console.error("Error uploading data:", result['message']);
-              this.uploadError.next(result['message']);
-            }
+              }
+              else{
+                console.error("Error uploading data:", result['message']);
+                this.uploadError.next(result['message']);
+              }
+            });
           });
         });
       }

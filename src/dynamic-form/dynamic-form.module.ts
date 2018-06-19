@@ -1,4 +1,4 @@
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule, ModuleWithProviders, ErrorHandler } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { ReactiveFormsModule }          from '@angular/forms';
@@ -57,4 +57,10 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
   ]
 })
 export class DynamicFormModule {
+  static forRoot(): ModuleWithProviders{
+    return {
+      ngModule: DynamicFormModule,
+      providers: [ DynamicFormService]
+    }
+  }
 }

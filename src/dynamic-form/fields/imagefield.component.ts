@@ -27,6 +27,7 @@ export class ImageFieldComponent extends BaseFieldComponent{
       return '';
     }
     else{
+      img = img.replace('file://', '');
       return cordova.file.dataDirectory + img;
     }
   }

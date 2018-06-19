@@ -64,8 +64,12 @@ export class LoginPage implements OnInit{
             this.loginError = data['message'];
           }
           else{
+            console.log("Got a valid JWT, setting it in storage.");
             this.storageService.setJWT(data['token']).then(() => {
-              this.navCtrl.pop();//push(HomePage,{},{direction: 'back'});
+              this.storageService.loadJWT().then(() => {
+                console.log("popping navCtrl");
+                this.navCtrl.pop();//push(HomePage,{},{direction: 'back'});
+              });
             });
           }
         }, (error) => {

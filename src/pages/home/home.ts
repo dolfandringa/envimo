@@ -28,7 +28,7 @@ export class HomePage implements OnInit{
   }
 
 
-  ionViewDidLeave(){
+  ionViewWillLeave(){
     console.debug("Deactivating subscriptions.");
     this.pageService.deactivate();
     this.active = false;

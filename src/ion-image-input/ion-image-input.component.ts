@@ -56,7 +56,7 @@ export class IonImageInputComponent implements ControlValueAccessor {
 
   set lastImage(val) {
     this._lastImage = val;
-    this.propagateChange(this._lastImage);
+    this.propagateChange('file://'+this._lastImage);
   }
 
   writeValue(value: any){

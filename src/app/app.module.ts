@@ -4,6 +4,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicStorageModule } from '@ionic/storage';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { EnviMo } from './app.component';
+import { Base64 } from '@ionic-native/base64';
+import { File } from '@ionic-native/file';
+import { FilePath } from '@ionic-native/file-path';
 
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
@@ -30,7 +33,7 @@ import { SocketIoModule } from 'ng-socket-io';
     BrowserModule,
     SocketIoModule,
     IonicStorageModule.forRoot(),
-    DynamicFormModule,
+    DynamicFormModule.forRoot(),
     HttpClientModule,
     IonicModule.forRoot(EnviMo),
   ],
@@ -49,6 +52,9 @@ import { SocketIoModule } from 'ng-socket-io';
     StorageService,
     PageService,
     Network,
+    File,
+    FilePath,
+    Base64,
   ]
 })
 export class AppModule {
