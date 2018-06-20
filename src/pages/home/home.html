@@ -2,11 +2,15 @@
   <ion-navbar color="primary">
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
-     </button>
-     <ion-title>Home</ion-title>
+    </button>
+    <ion-title>Home</ion-title>
+    <ion-buttons end>
+      <progress-bar *ngIf="pageService.connectionAvailable" max="0" status="0" percentage="true"></progress-bar>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
+
   <dynamic-form (valueChanged)="saveForm($event)" *ngIf="formSchema!==undefined" formName="Encounter" [datasetSchema]="formSchema"></dynamic-form>
 </ion-content>

@@ -17,6 +17,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { DynamicFormModule } from '../dynamic-form/dynamic-form.module';
+import { ProgressBarModule } from '../progress-bar/progress-bar.module';
+
 import { PageService } from '../providers/page-service/page-service';
 import { StorageService } from '../providers/storage-service/storage-service';
 
@@ -32,6 +34,7 @@ import { SocketIoModule } from 'ng-socket-io';
   imports: [
     BrowserModule,
     SocketIoModule,
+    ProgressBarModule,
     IonicStorageModule.forRoot(),
     DynamicFormModule.forRoot(),
     HttpClientModule,

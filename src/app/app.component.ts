@@ -33,9 +33,6 @@ export class EnviMo {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      console.log("pages: ", this.pages);
-      console.log("nav: ", this.nav);
-      console.log("nav active component: ", this.nav.getActive().getContent());
     });
   }
 

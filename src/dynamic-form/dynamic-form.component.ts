@@ -74,7 +74,7 @@ export class DynamicFormComponent implements OnInit{
   createFormGroup() {
     const group = this.fb.group({});
     this.config.fields.forEach(field => {
-      group.addControl(field.key, this.fb.control(field.value || '', field.validators || []));
+      group.addControl(field.key, this.fb.control(field.value || null, field.validators || []));
     });
     return group;
   }
