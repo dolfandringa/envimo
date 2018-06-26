@@ -5,7 +5,7 @@
     </button>
     <ion-title>Home</ion-title>
     <ion-buttons end>
-      <progress-bar *ngIf="pageService.connectionAvailable" max="0" status="0" percentage="true"></progress-bar>
+      <progress-bar *ngIf="pageService.connectionAvailable && pageService.queueLength>0" [max]="pageService.queueLength" [status]="pageService.progress" show_percentage="false"></progress-bar>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

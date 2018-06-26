@@ -16,3 +16,7 @@ export interface FieldConfig {
     options?: OptionConfig[],
     stringFormat?: string
 }
+
+export interface FieldSetConfig extends FieldConfig{
+  fields: FieldConfig[]
+}

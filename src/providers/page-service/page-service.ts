@@ -21,7 +21,8 @@ export class PageService {
   ready = new Subject<null>();
   newDatasetsAvailable = new Subject<null>();
   loginError = new Subject<null>();
-  queueLength: number;
+  queueLength: number = 0;
+  progress: number = 0;
 
   private _ready: boolean = false;
   private connectionAvailable: boolean = false;
@@ -88,6 +89,16 @@ export class PageService {
         console.log('Got a login error');
         this.loginError.next();
       });
+
+    this.storageService.queueChange
+      .takeWhile(() => this.active)
+      .subscribe((newLength: number) => {
+        console.log("Queuelength changed to", newLength);
+        if(newLength>this.queueLength){
+          this.queueLength = newLength;
+        }
+        this.progress = this.queueLength - newLength;
+      });
     this.storageService.newDatasetsAvailable
       .takeWhile(() => this.active)
       .subscribe(() => {
@@ -104,9 +115,9 @@ export class PageService {
     ]).then(value => {
       console.log("Finished initializing. jwt", value[0], "datasets", value[1]);
       this.authenticated = value[0]!==undefined;
-      if(value[0] == null || value[0] === undefined){
-        this.loginError.next();
-      }
+      //if(value[0] == null || value[0] === undefined){
+        //this.loginError.next();
+      //}
       this.jwt = value[0];
       this.datasets = value[1];
       console.log("Ready");

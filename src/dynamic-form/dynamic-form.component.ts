@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder }   from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
 import { BaseFieldComponent } from './fields/basefield.component';
+import { FieldConfig, FieldSetConfig } from './models/field-config.interface';
  
 
 @Component({
@@ -71,10 +72,16 @@ export class DynamicFormComponent implements OnInit{
     }
   }
 
-  createFormGroup() {
+  createFormGroup(fields) {
     const group = this.fb.group({});
-    this.config.fields.forEach(field => {
-      group.addControl(field.key, this.fb.control(field.value || null, field.validators || []));
+    fields.forEach(field => {
+      if(field.fieldType == 'fieldset'){
+        let subgroup = this.createFormGroup(field.fields);
+        group.addControl(field.key, subgroup);
+      }
+      else{
+        group.addControl(field.key, this.fb.control(field.value || null, field.validators || []));
+      }
     });
     return group;
   }
@@ -82,7 +89,7 @@ export class DynamicFormComponent implements OnInit{
 
   ngOnInit() {
     this.config = this.dfs.mapJSONSchema(this.datasetSchema)[this.formName];
-    this.formGroup = this.createFormGroup();
+    this.formGroup = this.createFormGroup(this.config.fields);
   }
 
   onSubmit() {

@@ -13,6 +13,7 @@ import { ImageFieldComponent } from './fields/imagefield.component';
 import { DateTimeFieldComponent } from './fields/datetimefield.component';
 import { IntegerFieldComponent } from './fields/integerfield.component';
 import { NumberFieldComponent } from './fields/numberfield.component';
+import { FieldSetComponent } from './fields/fieldset.component';
 
 import { DynamicFormService } from './dynamic-form.service';
 import { DynamicFormComponent } from './dynamic-form.component';
@@ -28,6 +29,7 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
     DateTimeFieldComponent,
     IntegerFieldComponent,
     NumberFieldComponent,
+    FieldSetComponent,
     DynamicFieldDirective,
     DynamicFormComponent,
     DynamicSubFormComponent,
@@ -53,6 +55,7 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
     DateTimeFieldComponent,
     IntegerFieldComponent,
     NumberFieldComponent,
+    FieldSetComponent,
     DynamicSubFormComponent,
   ]
 })

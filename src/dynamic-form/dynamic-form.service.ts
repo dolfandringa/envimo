@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
-import { FieldConfig } from './models/field-config.interface';
+import { FieldConfig, FieldSetConfig } from './models/field-config.interface';
 import { DynamicSubFormComponent } from './dynamic-subform.component';
 import { IntegerValidator } from './fields/validators';
 
@@ -29,6 +29,59 @@ export class DynamicFormService {
     modal.present();
   }
 
+  mapField(propkey, prop, mainschema, required): [{[s: string]: FormConfig}, FieldConfig]{
+    let fieldConfig: FieldConfig;
+    let subForms:{[s: string]: FormConfig} = {};
+    if (prop['type'] == 'array' || 'enum' in prop){
+      let retval = this.mapSelectField(propkey, prop, mainschema);
+      fieldConfig = retval[1];
+      console.log('Retval', retval);
+      for (let sfkey in retval[0]){
+        console.log("Subform", retval[0][sfkey])
+        subForms[sfkey] = retval[0][sfkey];
+      }
+    }
+    else if('contentMediaType' in prop){
+      fieldConfig = this.mapMediaField(propkey, prop);
+    }
+    else{
+      fieldConfig = this.mapSimpleField(propkey, prop);
+    }
+    if(required.indexOf(fieldConfig.key) > -1){
+      console.log("Field", fieldConfig.key, "is required.");
+      fieldConfig.validators.push(Validators.required);
+    }
+    else{
+      console.log(fieldConfig.key, "not in", required);
+    }
+    return [subForms, fieldConfig]
+  }
+
+  mapFieldSet(propkey, prop, mainschema):[{[s: string]: FormConfig}, FieldSetConfig]{
+    let fieldConfig: FieldSetConfig = {
+      key: propkey,
+      fieldType: 'fieldset',
+      fields: [],
+      validators: [],
+      subforms: [],
+      label: prop['title']
+    }
+    let required = [];
+    if('required' in prop){
+      required = prop['required'];
+    }
+    let subforms: {[s: string]: FormConfig} = {};
+    for(let spropkey in prop['properties']){
+      let sprop = prop['properties'][spropkey];
+      let retval = this.mapField(spropkey, sprop, mainschema, required);
+      for(let sfkey in retval[0]){
+        subforms[sfkey] = retval[0][sfkey];
+      }
+      fieldConfig.fields.push(retval[1]);
+    }
+    return [subforms, fieldConfig];
+  }
+
   mapJSONForm(formschema, formkey, mainschema): FormConfig{
     let formConfig: FormConfig = {
       key: formkey,
@@ -43,30 +96,20 @@ export class DynamicFormService {
     console.log("Required fields:", required);
     for (let propkey in formschema['properties']){
       let prop = formschema['properties'][propkey];
-      let fieldConfig: FieldConfig;
-      if (prop['type'] == 'array' || 'enum' in prop){
-        let retval = this.mapSelectField(propkey, prop, mainschema);
-        fieldConfig = retval[1];
-        console.log('Retval', retval);
-        for (let sfkey in retval[0]){
-          console.log("Subform", retval[0][sfkey])
+      if(prop['type'] == 'object' && 'properties' in prop){
+        let retval = this.mapFieldSet(propkey, prop, mainschema);
+        formConfig.fields.push(retval[1]);
+        for(let sfkey in retval[0]){
           formConfig.subforms[sfkey] = retval[0][sfkey];
         }
       }
-      else if('contentMediaType' in prop){
-        fieldConfig = this.mapMediaField(propkey, prop);
-      }
       else{
-        fieldConfig = this.mapSimpleField(propkey, prop);
+        let retval = this.mapField(propkey, prop, mainschema, required);
+        for(let sfkey in retval[0]){
+          formConfig.subforms[sfkey] = retval[0][sfkey];
+        }
+        formConfig.fields.push(retval[1]);
       }
-      if(required.indexOf(fieldConfig.key) > -1){
-        console.log("Field", fieldConfig.key, "is required.");
-        fieldConfig.validators.push(Validators.required);
-      }
-      else{
-        console.log(fieldConfig.key, "not in", required);
-      }
-      formConfig.fields.push(fieldConfig);
     }
     console.log('formConfig',formConfig);
     return formConfig;
@@ -106,7 +149,7 @@ export class DynamicFormService {
     }
     return fieldConfig;
   }
-  
+
   mapSelectField(key, prop, schema) :[{[s: string]: FormConfig}, FieldConfig]{
     let fieldConfig: FieldConfig = {
       key: key,
@@ -174,6 +217,12 @@ export class DynamicFormService {
               fieldConfig.fieldType = 'stringfield'
               fieldConfig.stringFormat = 'email';
               fieldConfig.validators.push(Validators.email);
+              break;
+            case 'coordinate_point_longitude':
+              fieldConfig.fieldType = 'stringfield';
+              break;
+            case 'coordinate_point_latitude':
+              fieldConfig.fieldType = 'stringfield';
               break;
           }
         }

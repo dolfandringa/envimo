@@ -8,6 +8,7 @@ import { ImageFieldComponent } from './fields/imagefield.component';
 import { DateTimeFieldComponent } from './fields/datetimefield.component';
 import { IntegerFieldComponent } from './fields/integerfield.component';
 import { NumberFieldComponent } from './fields/numberfield.component';
+import { FieldSetComponent } from './fields/fieldset.component';
 
 import { FieldConfig } from './models/field-config.interface';
 import { Field } from './models/field.interface';
@@ -22,6 +23,7 @@ const components = {
   integerfield: IntegerFieldComponent,
   numberfield: NumberFieldComponent,
   datetimefield: DateTimeFieldComponent,
+  fieldset: FieldSetComponent
 }
 
 @Directive({
