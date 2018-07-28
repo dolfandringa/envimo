@@ -18,6 +18,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { DynamicFormModule } from '../dynamic-form/dynamic-form.module';
 import { ProgressBarModule } from '../progress-bar/progress-bar.module';
+import { OfflineMapModule } from '../offlinemap/offlinemap.module';
 
 import { PageService } from '../providers/page-service/page-service';
 import { StorageService } from '../providers/storage-service/storage-service';
@@ -35,7 +36,8 @@ import { SocketIoModule } from 'ng-socket-io';
     BrowserModule,
     SocketIoModule,
     ProgressBarModule,
-    IonicStorageModule.forRoot(),
+    OfflineMapModule,
+    IonicStorageModule.forRoot({name: 'envimo'}),
     DynamicFormModule.forRoot(),
     HttpClientModule,
     IonicModule.forRoot(EnviMo),

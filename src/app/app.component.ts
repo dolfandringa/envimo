@@ -26,6 +26,7 @@ export class EnviMo {
     this.initializeApp();
     this.pages = [
       {title: 'Home', component: HomePage},
+      {title: 'Test', component: ListPage}
     ];
   }
 

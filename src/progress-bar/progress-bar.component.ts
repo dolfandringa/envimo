@@ -10,9 +10,11 @@ export class ProgressBarComponent {
   private _max: number = 0;
   private _status: number = 0;
   private percentage: number = 0;
-  public show_percentage: boolean = false;
+  
+  @Input()
+  show_percentage: boolean = false;
 
-  constructor() { }
+  constructor( ) { }
 
   get max(): number{
     return this._max;
