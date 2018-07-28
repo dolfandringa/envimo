@@ -47,15 +47,22 @@ export class StorageService {
   private _connected: boolean = false;
   private connectionInProgress: boolean = false;
   private socket: Socket;
+  private storage: any;
 
   constructor(
-    private storage: Storage,
+    //private storage: Storage,
     private base64: Base64,
     private file: File,
     private filePath: FilePath,
   ) {
     console.log('StorageService starting');
+    this.storage = new Storage({
+      name: '__envimo',
+      storeName: '_envimo',
+      driverOrder: ['indexeddb', 'websql', 'localstorage']
+    });
     this.initValues();
+
   }
 
   public getPathForImage(img){
@@ -101,6 +108,7 @@ export class StorageService {
   }
 
   initValues(){
+    console.log("Initializing values");
     return Promise.all([this.loadJWT(), this.loadDataQueue()]);
   }
 
@@ -207,6 +215,7 @@ export class StorageService {
   }
 
   getJWT() {
+    console.log('getting jwt');
     return this.jwt;
   }
 

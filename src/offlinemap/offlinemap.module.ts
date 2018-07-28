@@ -5,7 +5,7 @@ import { OfflineMap } from './offlinemap.component';
 import { LoadingProgress } from './loading-progress.component';
 
 import { TilesDbProvider } from './tiles-db';
-import { IonicStorageModule } from '@ionic/storage';
+//import { IonicStorageModule } from '@ionic/storage';
 import { HttpClientModule } from '@angular/common/http';
 import { ProgressBarModule } from '../progress-bar/progress-bar.module';
 
@@ -24,7 +24,7 @@ import { ProgressBarModule } from '../progress-bar/progress-bar.module';
   imports: [
     IonicModule,
     HttpClientModule,
-    IonicStorageModule.forRoot({name: 'offlinemap'}),
+    //IonicStorageModule.forRoot({name: 'offlinemap'}),
     ProgressBarModule
   ],
 	exports: [OfflineMap]

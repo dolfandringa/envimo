@@ -1,7 +1,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { IonicStorageModule } from '@ionic/storage';
+//import { IonicStorageModule } from '@ionic/storage';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { EnviMo } from './app.component';
 import { Base64 } from '@ionic-native/base64';
@@ -37,7 +37,7 @@ import { SocketIoModule } from 'ng-socket-io';
     SocketIoModule,
     ProgressBarModule,
     OfflineMapModule,
-    IonicStorageModule.forRoot({name: 'envimo'}),
+    //IonicStorageModule.forRoot(),
     DynamicFormModule.forRoot(),
     HttpClientModule,
     IonicModule.forRoot(EnviMo),
@@ -53,7 +53,7 @@ import { SocketIoModule } from 'ng-socket-io';
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    Storage,
+    //Storage,
     StorageService,
     PageService,
     Network,

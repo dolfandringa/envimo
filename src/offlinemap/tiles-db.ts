@@ -16,9 +16,16 @@ export class TilesDbProvider {
   
   private nTiles: number = 0;
   private nFailed: number = 0;
+  private storage: any;
 
-  constructor(private storage: Storage, private http: HttpClient) {
+  constructor(private http: HttpClient) {
+    this.storage = new Storage({
+      name: '__offlinemap',
+      storeName: '_offlinemap',
+      driverOrder: ['indexeddb', 'websql', 'localstorage']
+    });
   }
+
 
 
   public saveTiles(tileUrls){
