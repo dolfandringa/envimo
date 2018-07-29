@@ -7,6 +7,7 @@ import { IonImageInputModule } from '../ion-image-input/ion-image-input.module';
 
 import { BaseFieldComponent } from './fields/basefield.component';
 import { StringFieldComponent } from './fields/stringfield.component';
+import { LocationFieldComponent } from './fields/locationfield.component';
 import { SelectFieldComponent } from './fields/selectfield.component';
 import { MultipleSelectFieldComponent } from './fields/multipleselectfield.component';
 import { ImageFieldComponent } from './fields/imagefield.component';
@@ -29,6 +30,7 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
     DateTimeFieldComponent,
     IntegerFieldComponent,
     NumberFieldComponent,
+    LocationFieldComponent,
     FieldSetComponent,
     DynamicFieldDirective,
     DynamicFormComponent,
@@ -55,6 +57,7 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
     DateTimeFieldComponent,
     IntegerFieldComponent,
     NumberFieldComponent,
+    LocationFieldComponent,
     FieldSetComponent,
     DynamicSubFormComponent,
   ]

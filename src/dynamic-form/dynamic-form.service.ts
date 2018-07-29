@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
-import { FieldConfig, FieldSetConfig } from './models/field-config.interface';
+import { GeometryFieldConfig, FieldConfig, FieldSetConfig } from './models/field-config.interface';
 import { DynamicSubFormComponent } from './dynamic-subform.component';
 import { IntegerValidator } from './fields/validators';
 
@@ -57,6 +57,18 @@ export class DynamicFormService {
     return [subForms, fieldConfig]
   }
 
+  mapGeometryField(fields, mainschema, required) :[{[s: string]: FormConfig}, GeometryFieldConfig]{
+    let fieldConfig: GeometryFieldConfig = {
+      ḱey: '',
+      fieldType: 'geometryfield',
+      validators: [],
+      subforms: [],
+      label: '',
+      lat_fieldname: '',
+      lon_fieldname: ''
+    }
+  }
+
   mapFieldSet(propkey, prop, mainschema):[{[s: string]: FormConfig}, FieldSetConfig]{
     let fieldConfig: FieldSetConfig = {
       key: propkey,
@@ -71,9 +83,25 @@ export class DynamicFormService {
       required = prop['required'];
     }
     let subforms: {[s: string]: FormConfig} = {};
+    let geometry_fields = {};
+    let reval: any;
     for(let spropkey in prop['properties']){
       let sprop = prop['properties'][spropkey];
-      let retval = this.mapField(spropkey, sprop, mainschema, required);
+      if ('format' in sprop){
+        let fmt = sprop['format'];
+        if (fmt == 'coordinate_point_longitude' || fmt == 'coordinate_point_latitude'){
+          geometry_fields[spropkey] = sprop;
+          if(Object.keys(geometry_fields.keys).length == 2){
+            retval = this.mapGeometryField(geometry_fields, mainschema, required);
+            for (let sfkey in retval[0]){
+              //subforms[sfkey] = retval[0][sfkey];
+            }
+            // fieldConfig.fields.push(retval[1]);
+          }
+          //continue;
+        }
+      }
+      retval = this.mapField(spropkey, sprop, mainschema, required);
       for(let sfkey in retval[0]){
         subforms[sfkey] = retval[0][sfkey];
       }
@@ -219,10 +247,10 @@ export class DynamicFormService {
               fieldConfig.validators.push(Validators.email);
               break;
             case 'coordinate_point_longitude':
-              fieldConfig.fieldType = 'stringfield';
+              fieldConfig.fieldType = 'stringfield'
               break;
             case 'coordinate_point_latitude':
-              fieldConfig.fieldType = 'stringfield';
+              fieldConfig.fieldType = 'stringfield'
               break;
           }
         }

@@ -17,6 +17,11 @@ export interface FieldConfig {
     stringFormat?: string
 }
 
+export interface GeometryFieldConfig extends FieldConfig{
+    lat_fieldname: string,
+    lon_fieldname: string
+}
+
 export interface FieldSetConfig extends FieldConfig{
-  fields: FieldConfig[]
+    fields: FieldConfig[]
 }
