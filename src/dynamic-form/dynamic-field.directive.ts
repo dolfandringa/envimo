@@ -9,6 +9,7 @@ import { DateTimeFieldComponent } from './fields/datetimefield.component';
 import { IntegerFieldComponent } from './fields/integerfield.component';
 import { NumberFieldComponent } from './fields/numberfield.component';
 import { FieldSetComponent } from './fields/fieldset.component';
+import { LocationFieldComponent } from './fields/locationfield.component';
 
 import { FieldConfig } from './models/field-config.interface';
 import { Field } from './models/field.interface';
@@ -23,7 +24,8 @@ const components = {
   integerfield: IntegerFieldComponent,
   numberfield: NumberFieldComponent,
   datetimefield: DateTimeFieldComponent,
-  fieldset: FieldSetComponent
+  fieldset: FieldSetComponent,
+  locationfield: LocationFieldComponent
 }
 
 @Directive({

@@ -57,16 +57,17 @@ export class DynamicFormService {
     return [subForms, fieldConfig]
   }
 
-  mapGeometryField(fields, mainschema, required) :[{[s: string]: FormConfig}, GeometryFieldConfig]{
+  mapLocationField(fieldsetname, fieldset, fields): GeometryFieldConfig{
     let fieldConfig: GeometryFieldConfig = {
-      ḱey: '',
-      fieldType: 'geometryfield',
+      key: fieldsetname+'$$'+fields['lat']['key']+'$$'+fields['lon']['key'],
+      fieldType: 'locationfield',
       validators: [],
       subforms: [],
       label: '',
-      lat_fieldname: '',
-      lon_fieldname: ''
-    }
+      lat_key: fields['lat']['key'],
+      lon_key: fields['lon']['key']
+    };
+    return fieldConfig
   }
 
   mapFieldSet(propkey, prop, mainschema):[{[s: string]: FormConfig}, FieldSetConfig]{
@@ -84,24 +85,34 @@ export class DynamicFormService {
     }
     let subforms: {[s: string]: FormConfig} = {};
     let geometry_fields = {};
-    let reval: any;
     for(let spropkey in prop['properties']){
       let sprop = prop['properties'][spropkey];
       if ('format' in sprop){
         let fmt = sprop['format'];
-        if (fmt == 'coordinate_point_longitude' || fmt == 'coordinate_point_latitude'){
-          geometry_fields[spropkey] = sprop;
-          if(Object.keys(geometry_fields.keys).length == 2){
-            retval = this.mapGeometryField(geometry_fields, mainschema, required);
-            for (let sfkey in retval[0]){
-              //subforms[sfkey] = retval[0][sfkey];
-            }
-            // fieldConfig.fields.push(retval[1]);
+        if (fmt == 'coordinate_point_longitude' || fmt == 'coordinate_point_latitude'){ 
+          if (fmt == 'coordinate_point_longitude'){ 
+            geometry_fields['lon'] = {key: spropkey, field: sprop};
           }
-          //continue;
+          if (fmt == 'coordinate_point_latitude'){
+            geometry_fields['lat'] = {key: spropkey, field: sprop};
+          }
+          let keys = Object.keys(geometry_fields);
+          if(keys.indexOf('lat')>=0 && keys.indexOf('lon')>=0){
+            fieldConfig.fields.push(
+              this.mapLocationField(propkey, prop, geometry_fields));
+            fieldConfig.fields.push(
+              this.mapSimpleField(
+                geometry_fields['lat']['key'],
+                geometry_fields['lat']['field']));
+            fieldConfig.fields.push(
+              this.mapSimpleField(
+                geometry_fields['lon']['key'],
+                geometry_fields['lon']['field']));
+          }
+          continue;
         }
       }
-      retval = this.mapField(spropkey, sprop, mainschema, required);
+      let retval = this.mapField(spropkey, sprop, mainschema, required);
       for(let sfkey in retval[0]){
         subforms[sfkey] = retval[0][sfkey];
       }

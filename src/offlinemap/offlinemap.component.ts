@@ -85,7 +85,7 @@ var locateControl = leaflet.Control.extend({
   templateUrl: 'offlinemap.component.html'
 })
 export class OfflineMap implements OnInit, AfterViewInit{
-  @ViewChild('map') mapContainer: ElementRef;
+  @ViewChild('_map') mapContainer: ElementRef;
   @Output() locationChanged: EventEmitter<{lat: number, lng: number}> = new EventEmitter<{lat: number, lng: number}>();
 
   map: any;
@@ -94,11 +94,9 @@ export class OfflineMap implements OnInit, AfterViewInit{
   private loadingDestroy: Subject<boolean> = new Subject<boolean>();
 
 
-  @Input() 
-  minZoom: number = 12
-
-  @Input()
-  maxZoom: number = 15;
+  @Input() minZoom: number = 12
+  @Input() maxZoom: number = 15;
+  @Input() autoLoad: boolean = true;
 
   constructor(
     private tilesDb: TilesDbProvider,
@@ -109,7 +107,6 @@ export class OfflineMap implements OnInit, AfterViewInit{
   }
 
   ngOnInit(){
-    this.load();
   }
 
   showAlert(title, message) {
@@ -155,7 +152,8 @@ export class OfflineMap implements OnInit, AfterViewInit{
       });
     
     let tileurl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    this.map = leaflet.map("map", {
+    
+    this.map = leaflet.map("_map", {
       tap: false,
       zoomAnimation: false,
       markerZoomAnimation: false
@@ -222,10 +220,20 @@ export class OfflineMap implements OnInit, AfterViewInit{
     this.map.on('zoomend', (e) => {
       console.log('Zoomed to', e.target.getZoom());
     });
+    
+  }
+
+  locateMe(){
+    this.locCtrl.locateMe();
   }
 
   ngAfterViewInit(){
-    this.locCtrl.locateMe();
+    console.log('afterviewinit');
+    if(this.autoLoad){
+      console.log("Autoloading map");
+      this.load();
+      this.locCtrl.locateMe();
+    }
   }
 
 }

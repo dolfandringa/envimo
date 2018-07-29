@@ -18,8 +18,8 @@ export interface FieldConfig {
 }
 
 export interface GeometryFieldConfig extends FieldConfig{
-    lat_fieldname: string,
-    lon_fieldname: string
+    lat_key: string,
+    lon_key: string
 }
 
 export interface FieldSetConfig extends FieldConfig{

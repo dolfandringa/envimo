@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder }   from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
 import { BaseFieldComponent } from './fields/basefield.component';
-import { FieldConfig, FieldSetConfig } from './models/field-config.interface';
  
 
 @Component({
