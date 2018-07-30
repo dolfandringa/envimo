@@ -4,7 +4,6 @@ import { FormGroup, FormBuilder, Validators }   from '@angular/forms';
 import { PageService } from '../../providers/page-service/page-service';
 import { HttpClient } from '@angular/common/http';
 import { StorageService } from '../../providers/storage-service/storage-service';
-import { HomePage } from '../home/home';
 import { environment } from '@environment';
 
 /**

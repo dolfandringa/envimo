@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup }   from '@angular/forms';
 import { FieldConfig } from '../models/field-config.interface';
 import { FormConfig } from '../models/form-config.interface';
@@ -7,7 +7,6 @@ import { Field } from '../models/field.interface';
 import { DynamicSubFormComponent } from '../dynamic-subform.component';
 import { DynamicFormComponent } from '../dynamic-form.component';
 import { ModalController } from 'ionic-angular';
-import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'base-field',
@@ -17,7 +16,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 </ion-item>
   `
 })
-export class BaseFieldComponent implements Field{
+export class BaseFieldComponent implements Field, OnInit{
 
   config: FieldConfig;
   formGroup: FormGroup;
@@ -26,7 +25,6 @@ export class BaseFieldComponent implements Field{
 
   constructor(
     private modalCtrl: ModalController,
-    private sanitizer: DomSanitizer,
   ) {}
 
   get hasSubForms(): boolean{
@@ -113,8 +111,12 @@ export class BaseFieldComponent implements Field{
     }
   }
 
+  loadFinalize() {
+    console.log('BaseField load finalize');
+  }
+
   ngOnInit(){
-    console.log("This", this);
+    console.log("OnInit field", this.config.key);
     this.modals = {};
     this.addSubForms();
   }

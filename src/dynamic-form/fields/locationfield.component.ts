@@ -1,4 +1,4 @@
-import { ViewChild, Component } from '@angular/core';
+import { ViewChild, Component, AfterViewInit } from '@angular/core';
 import { BaseFieldComponent } from './basefield.component';
 import { OfflineMap } from '../../offlinemap/offlinemap.component';
  
@@ -8,13 +8,14 @@ import { OfflineMap } from '../../offlinemap/offlinemap.component';
   styles: ['offlinemap { display: block; width: 200px; height: 200px;}'],
   template: `
 <ion-item>
-  <offlinemap [autoLoad]="false" (locationChanged)="locationChanged($event)"></offlinemap>
+  <offlinemap id="myofflinemap" [autoLoad]="false" (locationChanged)="locationChanged($event)"></offlinemap>
   <button (click)="loadMap()" ion-button outline color="primary">Load map</button>
 </ion-item>
   `
 })
-export class LocationFieldComponent extends BaseFieldComponent {
+export class LocationFieldComponent extends BaseFieldComponent implements AfterViewInit {
   @ViewChild(OfflineMap) map: OfflineMap;
+
   locationChanged(location){
     console.log('Changing form location');
     console.log("Config:", this.config)
@@ -25,6 +26,16 @@ export class LocationFieldComponent extends BaseFieldComponent {
   loadMap(){
     this.map.load();
     this.map.locateMe();
+  }
+
+  loadFinalize() {
+    console.log('LocationField loadFinalize');
+    super.loadFinalize();
+    this.loadMap();
+  }
+
+  ngAfterViewInit() {
+    console.log('Location field AfterViewInit. Document:', document.getElementById('myofflinemap'));
   }
 
 }

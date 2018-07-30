@@ -136,8 +136,15 @@ export class OfflineMap implements OnInit, AfterViewInit{
     alert.present();
   }
 
+  private get mapLoaded() {
+    return typeof this.map != 'undefined';
+  }
+
   load() {
-    console.log('loading map');
+    console.log('loading map', this.map);
+    if(this.mapLoaded){
+      return
+    }
 
     this.loading = this.modalCtrl.create(
       LoadingProgress,

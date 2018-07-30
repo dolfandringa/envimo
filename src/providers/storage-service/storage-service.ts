@@ -6,8 +6,6 @@ import "rxjs/add/operator/takeWhile";
 import { environment } from '@environment';
 import { v4 as uuidv4 } from 'uuid';
 import { Base64 } from '@ionic-native/base64';
-import { File } from '@ionic-native/file';
-import { FilePath } from '@ionic-native/file-path';
 
 declare var cordova: any;
 
@@ -52,8 +50,6 @@ export class StorageService {
   constructor(
     //private storage: Storage,
     private base64: Base64,
-    private file: File,
-    private filePath: FilePath,
   ) {
     console.log('StorageService starting');
     this.storage = new Storage({

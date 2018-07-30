@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
 import { GeometryFieldConfig, FieldConfig, FieldSetConfig } from './models/field-config.interface';
-import { DynamicSubFormComponent } from './dynamic-subform.component';
 import { IntegerValidator } from './fields/validators';
 
 
@@ -59,7 +58,7 @@ export class DynamicFormService {
 
   mapLocationField(fieldsetname, fieldset, fields): GeometryFieldConfig{
     let fieldConfig: GeometryFieldConfig = {
-      key: fieldsetname+'$$'+fields['lat']['key']+'$$'+fields['lon']['key'],
+      key: fieldsetname+'_'+'offlinemap',
       fieldType: 'locationfield',
       validators: [],
       subforms: [],

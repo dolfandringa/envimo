@@ -91,12 +91,12 @@ export class HomePage implements OnInit{
       .subscribe(() => {
         console.log("Pageservice ready.")
         let datasets = this.pageService.getDatasets();
-        if(datasets !== null){
+        if(datasets !== null && datasets !== undefined){
           if(this.loadingActive){
             this.loading.dismiss();
           }
-          console.log("loaded datasets", this.datasets);
           this.datasets = datasets;
+          console.log("loaded datasets", this.datasets);
           this.actOnNewDatasets = false;
           this.formSchema = this.datasets[this.datasetName];
         }
@@ -122,7 +122,8 @@ export class HomePage implements OnInit{
     console.log("Homepage OnInit");
   }
 
-  ionViewDidEnter(){
+  ionViewDidLoad(){
+    console.log("Homepage ionViewDidLoad");
     this.init();
   }
 

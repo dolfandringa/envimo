@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { FormGroup, FormBuilder }   from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
@@ -9,7 +9,7 @@ import { BaseFieldComponent } from './fields/basefield.component';
   selector: 'dynamic-form',
   templateUrl: './dynamic-form.component.html',
 })
-export class DynamicFormComponent implements OnInit{
+export class DynamicFormComponent implements OnInit, AfterViewInit{
 
   @Input() datasetSchema: object;
   @Input() formName: string;
@@ -58,6 +58,7 @@ export class DynamicFormComponent implements OnInit{
     if(this.formGroup !== undefined){
       this.formGroup.reset();
     }
+    this.finalizeFields();
   }
 
   toText(){
@@ -87,8 +88,10 @@ export class DynamicFormComponent implements OnInit{
 
 
   ngOnInit() {
+    console.log("Dynamic form OnInit");
     this.config = this.dfs.mapJSONSchema(this.datasetSchema)[this.formName];
     this.formGroup = this.createFormGroup(this.config.fields);
+    console.log("Done with form OnInit");
   }
 
   onSubmit() {
@@ -97,6 +100,19 @@ export class DynamicFormComponent implements OnInit{
       this.valueChanged.emit(this);
       console.log("Form value", this.value);
     }
+  }
+
+  finalizeFields(){
+    for(let fname in this.fields){
+      let field = this.fields[fname];
+      console.log('Finalizing field loading for field', fname);
+      field.loadFinalize();
+    }
+  }
+
+  ngAfterViewInit() {
+    console.log('AfterViewinit dynamic form component with fields', this.fields);
+    this.finalizeFields();
   }
 
 }
