@@ -7,6 +7,7 @@ import { Field } from '../models/field.interface';
 import { DynamicSubFormComponent } from '../dynamic-subform.component';
 import { DynamicFormComponent } from '../dynamic-form.component';
 import { ModalController } from 'ionic-angular';
+import { DomSanitizer } from '@angular/platform-browser'; 
 
 @Component({
   selector: 'base-field',
@@ -25,6 +26,7 @@ export class BaseFieldComponent implements Field, OnInit{
 
   constructor(
     private modalCtrl: ModalController,
+    private sanitizer: DomSanitizer
   ) {}
 
   get hasSubForms(): boolean{

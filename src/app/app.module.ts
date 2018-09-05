@@ -1,12 +1,13 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-//import { IonicStorageModule } from '@ionic/storage';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { EnviMo } from './app.component';
 import { Base64 } from '@ionic-native/base64';
 import { File } from '@ionic-native/file';
 import { FilePath } from '@ionic-native/file-path';
+import { SocialSharing } from '@ionic-native/social-sharing';
+import { Geolocation } from '@ionic-native/geolocation';
 
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
@@ -37,7 +38,6 @@ import { SocketIoModule } from 'ng-socket-io';
     SocketIoModule,
     ProgressBarModule,
     OfflineMapModule,
-    //IonicStorageModule.forRoot(),
     DynamicFormModule.forRoot(),
     HttpClientModule,
     IonicModule.forRoot(EnviMo),
@@ -53,12 +53,13 @@ import { SocketIoModule } from 'ng-socket-io';
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    //Storage,
     StorageService,
     PageService,
     Network,
     File,
     FilePath,
+    SocialSharing,
+    Geolocation,
     Base64,
   ]
 })

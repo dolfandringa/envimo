@@ -5,7 +5,12 @@
     </button>
     <ion-title>Home</ion-title>
     <ion-buttons end>
-      <progress-bar *ngIf="pageService.connectionAvailable && pageService.queueLength>0" [max]="pageService.queueLength" [status]="pageService.progress" show_percentage="false"></progress-bar>
+      <button title="download repots" *ngIf="pageService.queueLength>0" color="white" clear ion-button icon-end icon-only (click)="pageService.exportQueue()">
+        <ion-icon name="download"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons class="progress" end>
+      <progress-bar *ngIf="pageService.queueLength>0" [max]="pageService.queueLength" [status]="pageService.progress" [show_percentage]="false"></progress-bar>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

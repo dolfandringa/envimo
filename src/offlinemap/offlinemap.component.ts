@@ -10,7 +10,7 @@ import 'rxjs/add/operator/takeUntil';
 var locateControl = leaflet.Control.extend({
   options: {
     position: 'topleft',
-    maxZoom: 15
+    maxZoom: 17
   },
   initialize: function(options) {
     leaflet.Util.setOptions(this, options);

@@ -6,6 +6,11 @@ import "rxjs/add/operator/takeWhile";
 import { environment } from '@environment';
 import { v4 as uuidv4 } from 'uuid';
 import { Base64 } from '@ionic-native/base64';
+import { File } from '@ionic-native/file';
+import { SocialSharing } from '@ionic-native/social-sharing';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { Platform } from 'ionic-angular';
 
 declare var cordova: any;
 
@@ -40,6 +45,8 @@ export class StorageService {
   newTokenAvailable = new Subject<null>();
   connected = new Subject<null>();
   jwt: string;
+  datasets: any;
+
   private uploading: boolean = false;
   private socket_active: boolean = false;
   private _connected: boolean = false;
@@ -48,8 +55,10 @@ export class StorageService {
   private storage: any;
 
   constructor(
-    //private storage: Storage,
     private base64: Base64,
+    public file: File,
+    public sharing: SocialSharing,
+    public plt: Platform
   ) {
     console.log('StorageService starting');
     this.storage = new Storage({
@@ -57,8 +66,11 @@ export class StorageService {
       storeName: '_envimo',
       driverOrder: ['indexeddb', 'websql', 'localstorage']
     });
-    this.initValues();
 
+  }
+
+  public initialize(){
+    return this.initValues();
   }
 
   public getPathForImage(img){
@@ -85,12 +97,21 @@ export class StorageService {
   loadJWT(){
     console.log("Loading JWT from storage");
     return this.storage.get("JWT").then((jwt) => {
+      console.log('Got jwt', jwt);
+      console.log('Undefined?', jwt===undefined || jwt == null);
       if(jwt === undefined || jwt == null){
         let message = "No token defined yet. Please login first.";
         this.JWTLoginError.next(message);
         console.info(message);
       }
       this.jwt = jwt;
+    });
+  }
+
+  loadDatasets(){
+    console.log("Loading datasets from storage");
+    return this.storage.get('datasets').then((datasets) => {
+      this.datasets = datasets;
     });
   }
 
@@ -105,7 +126,7 @@ export class StorageService {
 
   initValues(){
     console.log("Initializing values");
-    return Promise.all([this.loadJWT(), this.loadDataQueue()]);
+    return Promise.all([this.loadJWT(), this.loadDataQueue(), this.loadDatasets()]);
   }
 
   stopSocket(){
@@ -217,6 +238,7 @@ export class StorageService {
 
   storeDatasets(datasets) {
     console.log('Storing datasets', datasets);
+    this.datasets = datasets;
     this.storage.set('datasets', datasets).then(() => {
       console.log("Finished storing datasets");
       this.newDatasetsAvailable.next();
@@ -260,7 +282,7 @@ export class StorageService {
     });
   }
 
-  uploadData(){
+  public uploadData(){
     console.log("Starting data upload.");
     this.uploading = true;
     this.storage.get('dataQueue').then((dataQueue) => {
@@ -308,7 +330,7 @@ export class StorageService {
     });
   }
 
-  storeData(datasetname, formname, data) {
+  public storeData(datasetname, formname, data) {
     return new Promise((resolve, reject) => {
       let uuid = uuidv4();
       console.log('Storing submitted data for dataset',datasetname,'and form',formname,':', data,"with uuid",uuid);
@@ -330,8 +352,119 @@ export class StorageService {
     });
   }
 
-  getDatasets() {
-    return this.storage.get('datasets');
+  public removeQueueItems(uuids: string[]){
+    console.log("Removing queue items", uuids);
+    return this.storage.get('dataQueue').then((oldQueue) => {
+      console.log("Old queue", oldQueue);
+      for(let uuid of uuids){
+        let i = oldQueue.indexOf(uuid);
+        console.log("Removing",uuid,", index",i,"from the old queue",oldQueue);
+        oldQueue.splice(i, 1);
+      }
+      console.log("New queue", oldQueue);
+      return this.storage.set('dataQueue', oldQueue).then(() => {
+        this.queueChange.next(oldQueue.length);
+        let promises = new Array();
+        for(let uuid of uuids){
+          promises.push(this.storage.remove(uuid));
+        }
+        return Promise.all(promises);
+      });
+    });
+  }
+
+  public exportQueue(){
+    console.log("Exporting queue to a file");
+    let data = {};
+    let uuids = new Array();
+    this.storage.get('dataQueue').then((dataQueue) => {
+      let promises = new Array();
+      for(let i in dataQueue){
+        // loop over the queue
+        let uuid = dataQueue[i];
+        promises.push(this.storage.get(uuid).then((item) => {
+          let dsname = item['datasetname'];
+          let fname = item['formname'];
+          return this.base64EncodeFiles(item['data']).then((encodeResult) => {
+            console.log('Finished encoding', encodeResult);
+            let storeitem = {
+              form: fname,
+              dataset: dsname,
+              formdata: encodeResult
+            }
+            data[uuid+'.json'] = JSON.stringify(storeitem);
+            uuids.push(uuid);
+          });
+        }));
+      }
+      Promise.all(promises).then(() => {
+        let sharefunc: any;
+        let sharefail = function(err){
+          console.error("Failed sharing export file.", err);
+        }
+        if(this.plt.is('cordova')){
+          this.shareCordova(data).then(this.removeQueueItems(uuids)).catch(sharefail);
+        }
+        else{
+          this.shareWeb(data).then(this.removeQueueItems(uuids)).catch(sharefail);
+        }
+      }).catch((err) => {
+        console.error("Failed to create export file.", err);
+      });
+    }).catch((err) => {
+      console.error("Failed getting data queue.", err);
+    });
+  }
+
+  public getDatasets() {
+    return this.datasets;
+  }
+  
+  public shareCordova(data){
+    console.log('Sharing file on Cordova');
+    console.log('This', this);
+    let ts = new Date().getTime().toString();
+    console.log('ts',ts);
+    let tempdir = this.file.dataDirectory+ts;
+    console.log('tempdir', tempdir);
+    let zfname = this.file.dataDirectory+'/'+'export-'+ts+'.zip';
+    console.log('zfname', zfname);
+    return this.file.createDir(this.file.dataDirectory, ts, true).then(() => {
+      let promises = new Array();
+      for(let filename in data){
+        promises.push(this.file.writeFile(tempdir, filename, data[filename]));
+      }
+      return Promise.all(promises).then(() => {
+        let zeep = (<any>window).Zeep;
+        console.log('zeep', zeep);
+        return new Promise((resolve, reject) => {
+          zeep.zip({
+            from: tempdir,
+            to: zfname
+          }, resolve, reject);
+        }).then((res) => {
+            console.log("Successfully saved zip file.", res);
+            this.sharing.share('Please upload this file in the admin interface', 'Data exported', zfname, null).then(() => {
+              this.file.removeRecursively(this.file.dataDirectory, ts);
+              this.file.removeFile(this.file.dataDirectory, 'export-'+ts+'.zip');
+              console.log("Done cleaning up");
+            })
+        })
+      });
+    });
+  }
+
+  public shareWeb(data){
+    console.log('Downloading data as zip file using JSZip.', data);
+    let f = new JSZip()
+    let ts = new Date().getTime().toString();
+    for(let filename in data){
+      f.file(filename, data[filename]);
+    }
+    return f.generateAsync({type: 'blob'}).then((blob) => {
+      console.log('Finished creating zip file');
+      saveAs(blob, "export-"+ts+".zip");
+    });
   }
 
 

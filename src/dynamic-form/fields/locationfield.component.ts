@@ -5,11 +5,10 @@ import { OfflineMap } from '../../offlinemap/offlinemap.component';
 
 @Component({
   selector: 'location-field',
-  styles: ['offlinemap { display: block; width: 200px; height: 200px;}'],
+  styles: ['offlinemap { display: block; width: 400px; height: 400px;}'],
   template: `
 <ion-item>
   <offlinemap id="myofflinemap" [autoLoad]="false" (locationChanged)="locationChanged($event)"></offlinemap>
-  <button (click)="loadMap()" ion-button outline color="primary">Load map</button>
 </ion-item>
   `
 })

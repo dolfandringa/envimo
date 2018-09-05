@@ -1,8 +1,9 @@
 <div class="progress-outer">
-  <div *ngIf="!show_percentage" class="progress-inner" [style.width]="percentage + '%'">
-    {{ status }}/{{ max }}
+  <div class="progress-inner" [style.width]="percentage + '%'">
+    &nbsp;
   </div>
-  <div *ngIf="show_percentage" class="progress-inner" [style.width]="percentage + '%'">
-    {{ percentage| number: '1.1-1' }} %
+  <div class="label" [style.width]="96 - percentage + '%'">
+    <span *ngIf="!show_percentage">{{ status }}/{{ max }}</span>
+    <span *ngIf="show_percentage">{{ percentage| number: '1.1-1' }} %</span>
   </div>
 </div>

@@ -47,6 +47,10 @@ export class PageService {
       });
   }
 
+  public exportQueue(){
+    this.storageService.exportQueue();
+  }
+
   checkOnline(){
     console.log("Network type", this.network.type);
     if(this.platform.is('cordova')){
@@ -83,6 +87,7 @@ export class PageService {
       console.log("Queue length:", queueLength);
       this.queueLength = queueLength;
     });
+    console.log('Subscribing to JWTLoginError');
     this.storageService.JWTLoginError
       .takeWhile(() => this.active)
       .subscribe((error: string) => {
@@ -103,25 +108,22 @@ export class PageService {
       .takeWhile(() => this.active)
       .subscribe(() => {
         console.log("New datasets available. Getting them now.");
-        this.storageService.getDatasets().then((datasets) => {
-          console.log('New datasets', datasets);
-          this.datasets = datasets;
-          this.newDatasetsAvailable.next();
-        });
+        this.datasets = this.storageService.getDatasets();
+        console.log('New datasets', this.datasets);
+        this.newDatasetsAvailable.next();
       });
-    Promise.all([
-      this.storageService.getJWT(),
-      this.storageService.getDatasets(),
-    ]).then(value => {
-      console.log("Finished initializing. jwt", value[0], "datasets", value[1]);
-      this.authenticated = value[0]!==undefined;
+    this.storageService.initialize().then(() => {;
+      let jwt = this.storageService.getJWT();
+      let datasets = this.storageService.getDatasets();
+      console.log("Finished initializing. jwt", jwt, "datasets", datasets);
+      this.jwt = jwt;
+      this.authenticated = this.jwt!==undefined && this.jwt != null;
       //if(value[0] == null || value[0] === undefined){
         //this.loginError.next();
       //}
-      this.jwt = value[0];
-      this.datasets = value[1];
-      console.log("Ready");
-      if(this.connectionAvailable && this.jwt != null && this.jwt !== undefined){
+      this.datasets = datasets;
+      console.log("Ready. Authenticated?", this.authenticated, "Connection available?", this.connectionAvailable);
+      if(this.connectionAvailable && this.authenticated){
         console.log("Attempting websocket connection");
         this.storageService.createSocket();
       }
