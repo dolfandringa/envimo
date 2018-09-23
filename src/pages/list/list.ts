@@ -1,17 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams } from 'ionic-angular';
 import { File } from '@ionic-native/file';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { Platform } from 'ionic-angular';
 
-@IonicPage()
 @Component({
   selector: 'page-list',
   templateUrl: 'list.html'
 })
-
 export class ListPage implements OnInit{
 
   public debugdata = {};

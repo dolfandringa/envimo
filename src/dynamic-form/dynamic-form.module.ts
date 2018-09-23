@@ -6,6 +6,7 @@ import { ReactiveFormsModule }          from '@angular/forms';
 import { IonImageInputModule } from '../ion-image-input/ion-image-input.module';
 import { OfflineMapModule } from '../offlinemap/offlinemap.module';
 
+import { BaseFieldComponent } from './fields/basefield.component';
 import { StringFieldComponent } from './fields/stringfield.component';
 import { LocationFieldComponent } from './fields/locationfield.component';
 import { SelectFieldComponent } from './fields/selectfield.component';
@@ -23,6 +24,7 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
 
 @NgModule({
   declarations: [
+    BaseFieldComponent,
     StringFieldComponent,
     SelectFieldComponent,
     MultipleSelectFieldComponent,

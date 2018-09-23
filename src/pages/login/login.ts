@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, Loading, ToastController, IonicPage, NavController, NavParams } from 'ionic-angular';
+import { LoadingController, Loading, ToastController, NavController, NavParams } from 'ionic-angular';
 import { FormGroup, FormBuilder, Validators }   from '@angular/forms';
 import { PageService } from '../../providers/page-service/page-service';
 import { HttpClient } from '@angular/common/http';
 import { StorageService } from '../../providers/storage-service/storage-service';
 import { environment } from '@environment';
+import { HomePage } from '../home/home';
 
 /**
  * Generated class for the LoginPage page.
@@ -13,7 +14,6 @@ import { environment } from '@environment';
  * Ionic pages and navigation.
  */
 
-@IonicPage()
 @Component({
   selector: 'page-login',
   templateUrl: 'login.html',
@@ -67,7 +67,8 @@ export class LoginPage implements OnInit{
             this.storageService.setJWT(data['token']).then(() => {
               this.storageService.loadJWT().then(() => {
                 console.log("popping navCtrl");
-                this.navCtrl.pop();//push(HomePage,{},{direction: 'back'});
+                //this.navCtrl.pop();
+                this.navCtrl.push(HomePage,{},{direction: 'back'});
               });
             });
           }
