@@ -5,6 +5,7 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { EnviMo } from './app.component';
 import { Base64 } from '@ionic-native/base64';
 import { File } from '@ionic-native/file';
+import { Device } from '@ionic-native/device';
 import { FilePath } from '@ionic-native/file-path';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { Geolocation } from '@ionic-native/geolocation';
@@ -61,6 +62,7 @@ import { SocketIoModule } from 'ng-socket-io';
     SocialSharing,
     Geolocation,
     Base64,
+    Device,
   ]
 })
 export class AppModule {

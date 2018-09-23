@@ -4,6 +4,7 @@ import { Storage } from '@ionic/storage';
 import { Subject }    from 'rxjs';
 import "rxjs/add/operator/takeWhile";
 import { environment } from '@environment';
+import { Device } from '@ionic-native/device';
 import { v4 as uuidv4 } from 'uuid';
 import { Base64 } from '@ionic-native/base64';
 import { File } from '@ionic-native/file';
@@ -11,6 +12,7 @@ import { SocialSharing } from '@ionic-native/social-sharing';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { Platform } from 'ionic-angular';
+import { v1 as uuidv1 } from 'uuid';
 
 declare var cordova: any;
 
@@ -46,6 +48,7 @@ export class StorageService {
   connected = new Subject<null>();
   jwt: string;
   datasets: any;
+  deviceID: string;
 
   private uploading: boolean = false;
   private socket_active: boolean = false;
@@ -58,7 +61,8 @@ export class StorageService {
     private base64: Base64,
     public file: File,
     public sharing: SocialSharing,
-    public plt: Platform
+    public plt: Platform,
+    private device: Device
   ) {
     console.log('StorageService starting');
     this.storage = new Storage({
@@ -94,6 +98,26 @@ export class StorageService {
     });
   }
 
+  loadDeviceID(){
+    console.log("Loading UUID from storage");
+    return this.storage.get('DeviceID').then((deviceID) => {
+      console.log('Got DeviceID', deviceID);
+      if(deviceID === undefined || deviceID == null){
+        if(this.plt.is('cordova')){
+          this.deviceID = this.device.uuid;
+        }
+        else{
+          this.deviceID = uuidv1();
+        }
+        this.storage.set('DeviceID', this.deviceID);
+      }
+      else{
+        this.deviceID = deviceID;
+      }
+    });
+
+  }
+
   loadJWT(){
     console.log("Loading JWT from storage");
     return this.storage.get("JWT").then((jwt) => {
@@ -126,7 +150,7 @@ export class StorageService {
 
   initValues(){
     console.log("Initializing values");
-    return Promise.all([this.loadJWT(), this.loadDataQueue(), this.loadDatasets()]);
+    return Promise.all([this.loadDeviceID(), this.loadJWT(), this.loadDataQueue(), this.loadDatasets()]);
   }
 
   stopSocket(){
@@ -236,6 +260,10 @@ export class StorageService {
     return this.jwt;
   }
 
+  getDeviceID(){
+    return this.deviceID
+  }
+
   storeDatasets(datasets) {
     console.log('Storing datasets', datasets);
     this.datasets = datasets;
@@ -294,6 +322,8 @@ export class StorageService {
           this.base64EncodeFiles(item['data']).then((encodeResult) => {
             console.log('Finished encoding', encodeResult);
             let senditem = {
+              report_id: uuid,
+              device_id: this.getDeviceID(),
               form: fname,
               dataset: dsname,
               formdata: encodeResult

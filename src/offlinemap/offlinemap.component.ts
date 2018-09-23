@@ -158,7 +158,7 @@ export class OfflineMap implements OnInit, AfterViewInit{
         cssClass: 'loadingModal'
       });
     
-    let tileurl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    let tileurl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     
     this.map = leaflet.map("_map", {
       tap: false,
