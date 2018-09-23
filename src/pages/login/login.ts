@@ -68,7 +68,8 @@ export class LoginPage implements OnInit{
               this.storageService.loadJWT().then(() => {
                 console.log("popping navCtrl");
                 //this.navCtrl.pop();
-                this.navCtrl.push(HomePage,{},{direction: 'back'});
+                //this.navCtrl.push(HomePage,{},{direction: 'back'});
+                this.navCtrl.setRoot(HomePage);
               });
             });
           }
