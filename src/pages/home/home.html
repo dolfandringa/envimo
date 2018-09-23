@@ -3,7 +3,7 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Home</ion-title>
+    <ion-title>{{ this.datasetName }}</ion-title>
     <ion-buttons end>
       <button title="download reports" *ngIf="pageService.queueLength>0" color="white" clear ion-button icon-end icon-only (click)="pageService.exportQueue()">
         <ion-icon name="download"></ion-icon>
@@ -17,5 +17,5 @@
 
 <ion-content padding>
 
-  <dynamic-form (valueChanged)="saveForm($event)" *ngIf="formSchema!==undefined" formName="Encounter" [datasetSchema]="formSchema"></dynamic-form>
+  <dynamic-form (valueChanged)="saveForm($event)" *ngIf="formSchema!==undefined" [formName]="formName" [datasetSchema]="formSchema"></dynamic-form>
 </ion-content>

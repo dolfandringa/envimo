@@ -89,7 +89,9 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
 
   ngOnInit() {
     console.log("Dynamic form OnInit");
+    console.log('Form name', this.formName);
     this.config = this.dfs.mapJSONSchema(this.datasetSchema)[this.formName];
+    console.log('Got config', this.config);
     this.formGroup = this.createFormGroup(this.config.fields);
     console.log("Done with form OnInit");
   }

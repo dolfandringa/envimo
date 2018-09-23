@@ -155,7 +155,9 @@ export class DynamicFormService {
 
   mapJSONSchema(schema): {[s: string]: FormConfig}{
     let forms: {[s: string]: FormConfig} = {};
+    console.log("Schema", schema);
     for (let formkey in schema['properties']){
+      console.log('formkey', formkey);
       let formschema: object;
       if('$ref' in schema['properties'][formkey]){
         let ref = schema['properties'][formkey]['$ref'];
@@ -168,6 +170,7 @@ export class DynamicFormService {
       let formConfig = this.mapJSONForm(formschema, formkey, schema);
       forms[formkey] = formConfig;
     }
+    console.log('forms', forms);
     return forms;
   }
 

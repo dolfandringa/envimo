@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PageService } from '../../providers/page-service/page-service';
-import { NavController, ToastController, LoadingController, Loading } from 'ionic-angular';
+import { NavParams, NavController, ToastController, LoadingController, Loading } from 'ionic-angular';
 import { LoginPage } from '../login/login';
 import { DynamicFormComponent } from '../../dynamic-form/dynamic-form.component';
 import "rxjs/add/operator/takeWhile";
@@ -14,6 +14,7 @@ export class HomePage implements OnInit{
   datasets: object;
   formSchema: object;
   datasetName: string = 'Pawikan';
+  formName: string = 'Encounter';
   loading: Loading;
   private active: boolean = true;
   private actOnNewDatasets: boolean = true;
@@ -21,10 +22,16 @@ export class HomePage implements OnInit{
 
   constructor(
     public pageService: PageService,
+    public navParams: NavParams,
     public loadingCtrl: LoadingController,
     public navCtrl: NavController,
     public toastCtrl: ToastController,
   ) {
+    let ds_arg = navParams.get('dataset');
+    if(typeof ds_arg !== 'undefined'){
+      this.datasetName = ds_arg;
+    }
+    console.log('Loading dataset', this.datasetName);
   }
 
 
@@ -73,6 +80,12 @@ export class HomePage implements OnInit{
     });
   }
 
+  loadDataset(dsName){
+    console.log('Loading dataset', dsName);
+    this.formSchema = this.datasets[dsName];
+    this.formName = Object.keys(this.datasets[dsName].properties)[0];
+  }
+
   startLoading() {
     this.pageService.newDatasetsAvailable
       .takeWhile(() => this.actOnNewDatasets && this.active)
@@ -98,7 +111,7 @@ export class HomePage implements OnInit{
           this.datasets = datasets;
           console.log("loaded datasets", this.datasets);
           this.actOnNewDatasets = false;
-          this.formSchema = this.datasets[this.datasetName];
+          this.loadDataset(this.datasetName);
         }
         else{
           console.log("No datasets yet");

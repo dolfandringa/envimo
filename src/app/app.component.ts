@@ -5,7 +5,6 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { PageService } from '../providers/page-service/page-service';
 
 import { HomePage } from '../pages/home/home';
-import { ListPage } from '../pages/list/list';
 
 @Component({
   templateUrl: 'app.html'
@@ -17,26 +16,39 @@ export class EnviMo {
   public pagetitle = 'Home';
   rootPage:any = HomePage;
 
-  pages: Array<{title: string, component: any}>;
+  pages: Array<{title: string, component: any, args: any}> = [{title: 'Home', component: HomePage, args: {}}]
 
   constructor(public platform: Platform, public pageService: PageService, 
-              
-    public statusBar: StatusBar, public splashScreen: SplashScreen) {
+              public statusBar: StatusBar, public splashScreen: SplashScreen) {
     this.initializeApp();
-    this.pages = [
-      {title: 'Home', component: HomePage},
-      {title: 'Test', component: ListPage}
-    ];
+  }
+
+  updateMenu() {
+    console.log('Updating menu');
+    this.pages = [];
+    let dss = this.pageService.getDatasets();
+    console.log('Datasets:', dss);
+    for(let k in dss){
+      this.pages.push({title: k, component: HomePage, args: {dataset: k}});
+      console.log("Dataset", k, dss[k]);
+    }
   }
 
   initializeApp() {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.pageService.ready.subscribe(() => {
+        this.updateMenu();
+      });
+      this.pageService.newDatasetsAvailable.subscribe(() => {
+        this.updateMenu();
+      });
     });
   }
 
   openPage(page) {
-    this.nav.setRoot(page.component);
+    //this.nav.push(page.component, page.args);
+    this.nav.setRoot(page.component, page.args);
   }
 }
