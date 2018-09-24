@@ -420,8 +420,12 @@ export class StorageService {
             let storeitem = {
               form: fname,
               dataset: dsname,
+              report_id: uuid,
+              device_id: this.getDeviceID(),
+              token: this.getJWT(),
               formdata: encodeResult
             }
+            console.log("Storing", storeitem);
             data[uuid+'.json'] = JSON.stringify(storeitem);
             uuids.push(uuid);
           });
