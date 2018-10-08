@@ -7,5 +7,5 @@ export const environment = {
   production: false,
   envName: "dev",
   //backend_uri: 'http://admin.pawikan.lan:80'
-  backend_uri: 'http://127.0.0.1:8080'
+  backend_uri: 'http://127.0.0.1:5000'
 };
