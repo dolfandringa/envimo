@@ -10,7 +10,7 @@ export interface FieldConfig {
     label?: string,
     required?: boolean,
     order?: number,
-    validators?: ValidatorFn[],
+    validators: ValidatorFn[],
     contentMediaType?: string,
     contentEncoding?: string,
     options?: OptionConfig[],

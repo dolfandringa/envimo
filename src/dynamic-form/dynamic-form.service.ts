@@ -96,7 +96,10 @@ class FormConverter {
       for(let propkey in cond['properties']){
         let prop = cond['properties'][propkey];
         if(known_fields.indexOf(propkey)>=0){
-          condition.allowed_values[propkey] = prop['enum'];
+          condition.allowed_values[propkey] = [];
+          for (let val of prop['enum']){
+            condition.allowed_values[propkey].push(val['id']);
+          }
         }
         else{
           let fieldConfig = this.mapField(propkey, prop, condition.required);

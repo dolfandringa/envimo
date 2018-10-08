@@ -24,6 +24,8 @@ export class BaseFieldComponent implements Field, OnInit{
   subForms: {[s: string]: FormConfig };
   modals: {};
 
+  valueChanges: Observable;
+
   constructor(
     private modalCtrl: ModalController,
     private sanitizer: DomSanitizer
@@ -121,6 +123,7 @@ export class BaseFieldComponent implements Field, OnInit{
     console.log("OnInit field", this.config.key);
     this.modals = {};
     this.addSubForms();
+    this.valueChanges = this.formGroup.get(this.key).valueChanges;
   }
 
 }

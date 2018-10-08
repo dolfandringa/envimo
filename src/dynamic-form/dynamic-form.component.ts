@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Validators } from '@angular/forms';
 import { FormGroup, FormBuilder }   from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
@@ -86,6 +87,83 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
     return group;
   }
 
+  clearRequiredFields() {
+    for (let field of this.config.fields){
+      let validators = field.validators;
+      const idx = validators.indexOf(Validators.required);
+      if(idx>-1){
+        validators.splice(idx, 1);
+      }
+      console.log('Setting validators for field', field, 'in FormGroup.controls', this.formGroup.controls);
+      let control = this.formGroup.get(field.key);
+      control.setValidators(validators);
+    }
+  }
+
+  getField(fname){
+    for(let field of this.config.fields){
+      if (field.key == fname){
+        return field;
+      }
+    }
+  }
+
+  setFieldRequired(fname) {
+    console.log('Setting field', fname, 'as required');
+    let validators = this.getField(fname).validators;
+    const idx = validators.indexOf(Validators.required);
+    if(idx==-1){
+      validators.push(Validators.required);
+    }
+    this.formGroup.get(fname).setValidators(validators);
+  }
+
+  checkConditions(){
+    for (let condition of this.config.oneOf){
+      for (let field of condition.conditional_fields){
+        const idx = this.config.fields.indexOf(field);
+        if(idx>-1){
+          this.config.fields.splice(idx, 1);
+        }
+        if(field.key in this.formGroup.controls){
+          this.formGroup.removeControl(field.key);
+        }
+      }
+      console.log('Checking condition', condition);
+      let condition_met = true;
+      for (let fname in condition.allowed_values){
+        let val = this.fields[fname].value;
+        if(condition.allowed_values[fname].indexOf(val)==-1){
+          console.log(val,' is not on the allowed values', condition.allowed_values[fname]);
+          condition_met = false;
+        }
+      }
+      if(condition_met){
+        console.log('All conditions have been met');
+        for (let field of condition.conditional_fields){
+          console.log('Adding field', field);
+          this.config.fields.push(field);
+          this.formGroup.addControl(field.key, this.fb.control(field.value || null, field.validators || []));
+        }
+        this.clearRequiredFields();
+        for (let fname of condition.required){
+          this.setFieldRequired(fname);
+        }
+      }
+    }
+  }
+
+  setConditions(){
+    for (let condition of this.config.oneOf){
+      for (let fname in condition.allowed_values){
+        this.fields[fname].valueChanges.subscribe(val => {
+          console.log("Value for",this.fields[fname], "changed to", val);
+          this.checkConditions();
+        });
+      }
+    }
+  }
+
 
   ngOnInit() {
     console.log("Dynamic form OnInit");
@@ -114,6 +192,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
 
   ngAfterViewInit() {
     console.log('AfterViewinit dynamic form component with fields', this.fields);
+    this.setConditions();
     this.finalizeFields();
   }
 
