@@ -63,9 +63,11 @@ export class DynamicSubFormComponent implements OnInit {
       let str: string[]= [this.config.title];
       for(let fkey in this.fields){
         let field = this.fields[fkey];
-        if(typeof field == 'ImageFieldComponent'){
-          str.push(field.toText());
-        }
+        console.log("getting text for field",field)
+        console.log("type", typeof field);
+        //if(field instanceof ImageFieldComponent){
+        //  str.push(field.toText());
+        //}
       }
       return str.join(', ');
     }

@@ -92,6 +92,9 @@ export class HomePage implements OnInit{
       .subscribe(() => {
         console.log("newDatasetsAvailable");
         this.datasets = this.pageService.getDatasets();
+        this.datasetName = Object.keys(this.datasets)[0];
+        this.formName = Object.keys(this.datasets[this.datasetName]['properties'])[0]
+        console.log("Loading dataset",this.datasetName,"and form",this.formName);
         console.log("loaded datasets", this.datasets);
         this.formSchema = this.datasets[this.datasetName];
         if(this.loadingActive){
@@ -104,7 +107,7 @@ export class HomePage implements OnInit{
       .subscribe(() => {
         console.log("Pageservice ready.")
         let datasets = this.pageService.getDatasets();
-        if(datasets !== null && datasets !== undefined){
+        if(datasets != null){
           if(this.loadingActive){
             this.loading.dismiss();
           }
