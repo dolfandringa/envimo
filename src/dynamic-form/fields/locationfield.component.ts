@@ -34,7 +34,7 @@ export class LocationFieldComponent extends BaseFieldComponent implements AfterV
   }
 
   ngAfterViewInit() {
-    console.log('Location field AfterViewInit. Document:', document.getElementById('myofflinemap'));
+    console.log('Location field AfterViewInit. Document:', document.getElementById('_map'));
   }
 
 }

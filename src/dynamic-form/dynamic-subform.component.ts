@@ -6,6 +6,7 @@ import { ViewController } from 'ionic-angular';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
 import { BaseFieldComponent } from './fields/basefield.component';
+//import { ImageFieldComponent } from './fields/imagefield.component';
  
 
 @Component({
@@ -59,10 +60,12 @@ export class DynamicSubFormComponent implements OnInit {
 
   toText(){
     if(this.fields){
-      let str: string[]= [];
+      let str: string[]= [this.config.title];
       for(let fkey in this.fields){
         let field = this.fields[fkey];
-        str.push(field.toText());
+        if(typeof field == 'ImageFieldComponent'){
+          str.push(field.toText());
+        }
       }
       return str.join(', ');
     }
@@ -72,7 +75,7 @@ export class DynamicSubFormComponent implements OnInit {
     const group = this.fb.group({});
     this.config.fields.forEach(field => {
       console.log("Field value:",field.value);
-      group.addControl(field.key, this.fb.control(field.value || '', field.validators || []));
+      group.addControl(field.key, this.fb.control(field.value, field.validators || []));
     });
     return group;
   }

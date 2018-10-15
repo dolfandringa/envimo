@@ -25,11 +25,13 @@ export class FieldSetComponent extends BaseFieldComponent{
   fields: {[s: string]: BaseFieldComponent} = {};
   addField(field: BaseFieldComponent){
     this.fields[field.key] = field;
+    //field.loadFinalize();
   }
   
   loadFinalize() {
     console.log('FieldSet loadFinalize');
     super.loadFinalize();
+    console.log('Fieldset fields', this.fields);
     for(let fname in this.fields){
       console.log('Finalizing field loading for field', fname);
       this.fields[fname].loadFinalize();

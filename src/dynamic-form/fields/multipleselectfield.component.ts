@@ -16,9 +16,10 @@ import { BaseFieldComponent } from './basefield.component';
 <ion-item>
   <ion-grid>
     <ion-row wrap>
-      <ion-col width-33 *ngFor="let opt of config.options">
+      <ion-col width-33 *ngFor="let opt of config.options; let i = index">
         <ion-card>
           <ion-card-header>
+              {{ i+1 }}
               <button style="float: right;" ion-button color="dark" clear small (click)="removeOption(opt)">
                 <ion-icon name="close"></ion-icon>
               </button>

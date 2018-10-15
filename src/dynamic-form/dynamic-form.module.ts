@@ -16,6 +16,10 @@ import { DateTimeFieldComponent } from './fields/datetimefield.component';
 import { IntegerFieldComponent } from './fields/integerfield.component';
 import { NumberFieldComponent } from './fields/numberfield.component';
 import { FieldSetComponent } from './fields/fieldset.component';
+import { SubFormFieldComponent } from './fields/subformfield.component';
+import { BooleanFieldComponent } from './fields/booleanfield.component';
+import { TextAreaFieldComponent } from './fields/textareafield.component';
+import { RadioFieldComponent } from './fields/radiofield.component';
 
 import { DynamicFormService } from './dynamic-form.service';
 import { DynamicFormComponent } from './dynamic-form.component';
@@ -32,8 +36,12 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
     DateTimeFieldComponent,
     IntegerFieldComponent,
     NumberFieldComponent,
+    SubFormFieldComponent,
+    TextAreaFieldComponent,
+    RadioFieldComponent,
     LocationFieldComponent,
     FieldSetComponent,
+    BooleanFieldComponent,
     DynamicFieldDirective,
     DynamicFormComponent,
     DynamicSubFormComponent,
@@ -54,6 +62,7 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
   ],
   entryComponents: [
     StringFieldComponent,
+    TextAreaFieldComponent,
     SelectFieldComponent,
     MultipleSelectFieldComponent,
     ImageFieldComponent,
@@ -62,6 +71,9 @@ import { DynamicFieldDirective } from './dynamic-field.directive';
     NumberFieldComponent,
     LocationFieldComponent,
     FieldSetComponent,
+    RadioFieldComponent,
+    BooleanFieldComponent,
+    SubFormFieldComponent,
     DynamicSubFormComponent,
   ]
 })

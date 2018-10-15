@@ -34,14 +34,23 @@ class FormConverter {
       console.log("Checking field subform references");
 
       // Check for all the referred subforms and add them to the config and correct the name reference.
-      for(let sfkey of this.getSubFormReferences(formConfig.fields)){
+      let subforms = this.getSubFormReferences(formConfig.fields);
+      for(let sfkey in subforms){
         formConfig.subforms[sfkey] = this.subforms[sfkey];
         formConfig.subforms[sfkey].form_type = 'select_subform';
       }
       for (let condition of formConfig.oneOf){
-        for(let sfkey of this.getSubFormReferences(condition.conditional_fields)){
+        //Check referred subforms, add them to the config, correct the references and set field titles.
+        let subforms = this.getSubFormReferences(condition.conditional_fields);
+        for(let sfkey in subforms){
           formConfig.subforms[sfkey] = this.subforms[sfkey];
           formConfig.subforms[sfkey].form_type = 'conditional_subform';
+          for (let field of subforms[sfkey]){
+            if(field.label != ''){
+              field.label = field.label + ' ';
+            }
+            field.label = field.label + this.subforms[sfkey].title;
+          }
         }
       }
       this.forms[formkey] = formConfig;
@@ -49,8 +58,8 @@ class FormConverter {
     console.log('forms', this.forms);
   }
 
-  getSubFormReferences(fields: FieldConfig[]): string[]{
-    let sfkeys = [];
+  getSubFormReferences(fields: FieldConfig[]): {[s: string]: FieldConfig[]}{
+    let subforms = {};
     for (let field of fields){
       let field_sfkeys = [];
       console.log("Checking field", field);
@@ -60,14 +69,17 @@ class FormConverter {
       for(let ref of field.subforms){
         console.log('Checking subform', ref);
         let sfkey = this.getFormKeyFromRef(ref);
+        if (subforms[sfkey] === undefined){
+          subforms[sfkey] = [];
+        }
         console.log('sfkey', sfkey);
+        subforms[sfkey].push(field);
         field_sfkeys.push(sfkey);
-        sfkeys.push(sfkey);
       }
-      field.subforms = sfkeys;
+      field.subforms = field_sfkeys;
       console.log("Finised checking field", field);
     }
-    return sfkeys;
+    return subforms;
   }
 
   public getForms(){
@@ -270,7 +282,7 @@ class FormConverter {
   mapSubFormField(key, prop) :FieldConfig{
     let fieldConfig: FieldConfig = {
       key: key,
-      fieldType: 'subform',
+      fieldType: 'subformfield',
       label: '',
       validators: [],
       subforms: [prop['$ref']],
@@ -306,6 +318,10 @@ class FormConverter {
         fieldConfig.options = prop['enum'];
       }
       fieldConfig.fieldType = 'selectfield';
+      /*if(fieldConfig.options.length <= 3){
+        fieldConfig.fieldType = 'radiofield';
+      }
+      */
     }
     return fieldConfig;
   }
@@ -315,7 +331,8 @@ class FormConverter {
       key: key,
       fieldType: 'unkown',
       label: prop['title'],
-      validators: []
+      validators: [],
+      value: null
     }
     let ft = prop['type'];
     if ('minimum' in prop){
@@ -325,10 +342,13 @@ class FormConverter {
       fieldConfig.validators.push(Validators.max(prop['maximum']));
     }
     if ('minLength' in prop){
-      fieldConfig.validators.push(Validators.min(prop['minLength']));
+      fieldConfig.validators.push(Validators.minLength(prop['minLength']));
     }
     if ('maxLength' in prop){
-      fieldConfig.validators.push(Validators.max(prop['maxLength']));
+      fieldConfig.validators.push(Validators.maxLength(prop['maxLength']));
+    }
+    if ('value' in prop){
+      fieldConfig.value = prop['value'];
     }
     switch (ft) {
       case 'string':
@@ -336,6 +356,9 @@ class FormConverter {
           switch(prop['format']){
             case 'date-time':
               fieldConfig.fieldType = 'datetimefield';
+              if (fieldConfig.value = ''){
+                fieldConfig.value = new Date();
+              }
               break;
             case 'email':
               fieldConfig.fieldType = 'stringfield'
@@ -350,9 +373,16 @@ class FormConverter {
               break;
           }
         }
-        else{
+        else if('maxLength' in prop){
           fieldConfig.fieldType = 'stringfield';
         }
+        else{
+          fieldConfig.fieldType = 'textareafield';
+        }
+        break;
+      case 'boolean':
+        fieldConfig.fieldType = 'booleanfield'
+        fieldConfig.value = false;
         break;
       case 'integer':
         fieldConfig.fieldType = 'integerfield';

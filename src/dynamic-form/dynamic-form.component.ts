@@ -1,16 +1,17 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, AfterViewInit, AfterViewChecked, AfterContentInit } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { FormGroup, FormBuilder }   from '@angular/forms';
 import { FormConfig } from './models/form-config.interface';
 import { DynamicFormService } from './dynamic-form.service';
 import { BaseFieldComponent } from './fields/basefield.component';
+import { ChangeDetectorRef } from '@angular/core';
  
 
 @Component({
   selector: 'dynamic-form',
   templateUrl: './dynamic-form.component.html',
 })
-export class DynamicFormComponent implements OnInit, AfterViewInit{
+export class DynamicFormComponent implements OnInit, AfterViewInit, AfterViewChecked, AfterContentInit, OnChanges{
 
   @Input() datasetSchema: object;
   @Input() formName: string;
@@ -19,16 +20,28 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
   payLoad: string;
   formGroup: FormGroup;
   config: FormConfig;
+  checkNeeded: boolean;
   fields: {[s: string]: BaseFieldComponent} = {};
 
   constructor(
     public dfs: DynamicFormService,
     private fb: FormBuilder,
+    private cdRef: ChangeDetectorRef
   ) {
   }
 
   addField(field: BaseFieldComponent){
     this.fields[field.key] = field;
+    let req_fields = Object.keys(this.config.fields).length;
+    let present_fields = Object.keys(this.fields).length;
+    console.log("Added field",present_fields, 'of', req_fields);
+    console.log('Finalizing field', field);
+    this.fields[field.key].loadFinalize();
+    this.fields[field.key].valueChanges.subscribe(val => {
+      console.log("Value for",this.fields[field.key], "changed to", val);
+      this.checkConditions();
+    });
+    this.checkNeeded = true; 
   }
 
   get value(): any{
@@ -56,10 +69,14 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
   }
 
   reset(){
-    if(this.formGroup !== undefined){
+    this.fields =  {};
+    this.ngOnInit();
+    /*if(this.formGroup !== undefined){
       this.formGroup.reset();
     }
-    this.finalizeFields();
+     */
+    //this.ngAfterViewInit()
+    this.cdRef.detectChanges();
   }
 
   toText(){
@@ -81,23 +98,29 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
         group.addControl(field.key, subgroup);
       }
       else{
-        group.addControl(field.key, this.fb.control(field.value || null, field.validators || []));
+        group.addControl(field.key, this.fb.control(field.value, field.validators || []));
       }
     });
     return group;
   }
 
-  clearRequiredFields() {
-    for (let field of this.config.fields){
-      let validators = field.validators;
-      const idx = validators.indexOf(Validators.required);
-      if(idx>-1){
-        validators.splice(idx, 1);
+  clearRequiredConditionalFields() {
+    for (let condition of this.config.oneOf){
+      for(let fname in condition.conditional_fields){
+        let field = condition.conditional_fields[fname];
+        let validators = field.validators;
+        const idx = validators.indexOf(Validators.required);
+        if(idx>-1){
+          validators.splice(idx, 1);
+        }
+        console.log('Setting validators for field', field, 'in FormGroup.controls', this.formGroup.controls);
+        let control = this.formGroup.get(field.key);
+        if (control != null){
+          control.setValidators(validators);
+        }
       }
-      console.log('Setting validators for field', field, 'in FormGroup.controls', this.formGroup.controls);
-      let control = this.formGroup.get(field.key);
-      control.setValidators(validators);
     }
+
   }
 
   getField(fname){
@@ -120,6 +143,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
 
   checkConditions(){
     for (let condition of this.config.oneOf){
+      console.log("Removing conditional fields"); 
       for (let field of condition.conditional_fields){
         const idx = this.config.fields.indexOf(field);
         if(idx>-1){
@@ -132,6 +156,10 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
       console.log('Checking condition', condition);
       let condition_met = true;
       for (let fname in condition.allowed_values){
+        if(this.fields[fname] == undefined){
+          condition_met = false;
+          continue;
+        }
         let val = this.fields[fname].value;
         if(condition.allowed_values[fname].indexOf(val)==-1){
           console.log(val,' is not on the allowed values', condition.allowed_values[fname]);
@@ -145,7 +173,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
           this.config.fields.push(field);
           this.formGroup.addControl(field.key, this.fb.control(field.value || null, field.validators || []));
         }
-        this.clearRequiredFields();
+        this.clearRequiredConditionalFields();
         for (let fname of condition.required){
           this.setFieldRequired(fname);
         }
@@ -153,7 +181,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
     }
   }
 
-  setConditions(){
+    /*setConditions(){
     for (let condition of this.config.oneOf){
       for (let fname in condition.allowed_values){
         this.fields[fname].valueChanges.subscribe(val => {
@@ -162,7 +190,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
         });
       }
     }
-  }
+  }*/
 
 
   ngOnInit() {
@@ -172,6 +200,11 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
     console.log('Got config', this.config);
     this.formGroup = this.createFormGroup(this.config.fields);
     console.log("Done with form OnInit");
+    this.formGroup.valueChanges.subscribe(val => {
+      console.log('Form value changed to', val);
+      console.log('Valid?',this.formGroup.valid);
+      console.log('FormGroup', this.formGroup);
+    });
   }
 
   onSubmit() {
@@ -191,9 +224,24 @@ export class DynamicFormComponent implements OnInit, AfterViewInit{
   }
 
   ngAfterViewInit() {
-    console.log('AfterViewinit dynamic form component with fields', this.fields);
-    this.setConditions();
-    this.finalizeFields();
+    console.log('AfterViewInit dynamic form component with fields', this.fields);
+    //this.setConditions();
+  }
+
+  ngAfterViewChecked() {
+    if(this.checkNeeded){
+      this.checkConditions();
+      this.checkNeeded = false;
+    }
+    this.cdRef.detectChanges();
+  }
+
+  ngAfterContentInit() {
+    console.log('AfterContentInit')
+  }
+
+  ngOnChanges(changes) {
+    console.log('ngOnChanges', changes)
   }
 
 }

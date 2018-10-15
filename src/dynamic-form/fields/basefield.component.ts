@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormGroup }   from '@angular/forms';
 import { FieldConfig } from '../models/field-config.interface';
 import { FormConfig } from '../models/form-config.interface';
@@ -8,6 +8,7 @@ import { DynamicSubFormComponent } from '../dynamic-subform.component';
 import { DynamicFormComponent } from '../dynamic-form.component';
 import { ModalController } from 'ionic-angular';
 import { DomSanitizer } from '@angular/platform-browser'; 
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'base-field',
@@ -17,14 +18,14 @@ import { DomSanitizer } from '@angular/platform-browser';
 </ion-item>
   `
 })
-export class BaseFieldComponent implements Field, OnInit{
+export class BaseFieldComponent implements Field, OnInit, AfterViewInit{
 
   config: FieldConfig;
   formGroup: FormGroup;
   subForms: {[s: string]: FormConfig };
   modals: {};
 
-  valueChanges: Observable;
+  valueChanges: Observable<any>;
 
   constructor(
     private modalCtrl: ModalController,
@@ -82,6 +83,7 @@ export class BaseFieldComponent implements Field, OnInit{
     else{
       this.value = form.value;
     }
+    this.formGroup.get(this.key).setValue(this.value);
     console.log("Updated field:", this);
     console.log("Updated field value:", this.value);
   }
@@ -121,9 +123,14 @@ export class BaseFieldComponent implements Field, OnInit{
 
   ngOnInit(){
     console.log("OnInit field", this.config.key);
+    console.log("value", this.value);
     this.modals = {};
     this.addSubForms();
     this.valueChanges = this.formGroup.get(this.key).valueChanges;
+  }
+
+  ngAfterViewInit(){
+    console.log("Finished initializing field");
   }
 
 }
