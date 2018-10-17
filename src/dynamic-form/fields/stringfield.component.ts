@@ -8,6 +8,8 @@ import { BaseFieldComponent } from './basefield.component';
 <ion-item [formGroup]="formGroup">
   <ion-label [attr.for]="config.key" floating>{{config.label}}</ion-label>
   <ion-input [formControlName]="config.key" [id]="config.key" [type]="config.stringFormat"></ion-input>
+</ion-item>
+<ion-item no-lines>
   <p item-end *ngIf="!valid" class="errorMessage">
     <em ion-text color="danger" *ngIf="errors.required">Required</em>
     <em ion-text color="danger" *ngIf="errors.maxlength">Value can't be longer than {{errors.maxlength.requiredLength}} characters. Please remove {{errors.maxlength.actualLength - errors.maxlength.requiredLength}} characters.</em>

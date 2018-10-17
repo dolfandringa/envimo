@@ -328,6 +328,7 @@ export class StorageService {
               dataset: dsname,
               formdata: encodeResult
             }
+            console.log('Sending data')
             this.socket.emit('saveData', senditem, (result) => {
               this.uploading = false;
               console.log("Finished emitting, result:",result);

@@ -14,10 +14,11 @@ import { BaseFieldComponent } from './basefield.component';
       <ion-label>{{opt.label}}</ion-label>
       <ion-radio [value]="opt.id"></ion-radio>
     </ion-item>
-
-    <p item-end *ngIf="!valid" class="errorMessage">
-      <em ion-text color="danger" *ngIf="errors.required">Required</em>
-    </p>
+    <ion-item no-lines>
+      <p item-end *ngIf="!valid" class="errorMessage">
+        <em ion-text color="danger" *ngIf="errors.required">Required</em>
+      </p>
+    </ion-item>
   </ion-list>
   </div>
   `
