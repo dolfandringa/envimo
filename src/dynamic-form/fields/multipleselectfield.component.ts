@@ -9,6 +9,8 @@ import { BaseFieldComponent } from './basefield.component';
   <ion-label [attr.for]="config.key" floating>{{config.label}}</ion-label>
   <ion-input type="hidden" [formControlName]="config.key" [id]="config.key"></ion-input>
   <button type="button" item-content *ngIf="hasSubForms" ion-button (click)="showSubForms()">Add</button>
+</ion-item>
+<ion-item no-lines>
   <p item-end *ngIf="!valid" class="errorMessage">
     <em ion-text color="danger" *ngIf="errors.required">Required</em>
   </p>

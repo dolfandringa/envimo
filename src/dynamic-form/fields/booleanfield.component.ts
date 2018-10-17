@@ -8,6 +8,8 @@ import { BaseFieldComponent } from './basefield.component';
 <ion-item [formGroup]="formGroup">
   <ion-label [attr.for]="config.key">{{config.label}}</ion-label>
   <ion-checkbox [formControlName]="config.key" [id]="config.key"></ion-checkbox>
+</ion-item>
+<ion-item no-lines>
   <p item-end *ngIf="!valid" class="errorMessage">
     <em ion-text color="danger" *ngIf="errors.required">Required</em>
   </p>

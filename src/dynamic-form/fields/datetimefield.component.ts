@@ -8,6 +8,8 @@ import { BaseFieldComponent } from './basefield.component';
 <ion-item [formGroup]="formGroup">
   <ion-label [attr.for]="config.key" floating>{{config.label}}</ion-label>
   <ion-datetime displayFormat="YYYY-MM-DD HH:mm" pickerFormat="D MMM YYYY h:mm a" [formControlName]="config.key" [id]="config.key"></ion-datetime>
+</ion-item>
+<ion-item no-lines>
   <p item-end *ngIf="!valid" class="errorMessage">
     <em ion-text color="danger" *ngIf="errors.required">Required</em>
   </p>
